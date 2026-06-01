@@ -1,12 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { Home, Compass, Database, LineChart, LayoutTemplate, Download, Settings, Sparkles } from "lucide-react";
+import { Home, Compass, LineChart, LayoutTemplate, Download, Settings, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { to: "/", label: "Home", icon: Home },
-  { to: "/scoping", label: "Software Scoping Expert", icon: Compass },
-  { to: "/revenue", label: "Revenue Mapping", icon: Database },
-  { to: "/model", label: "Market Model Engine", icon: LineChart },
+  { to: "/", label: "Home", icon: Home, end: true },
+  { to: "/scoping", label: "Software Scoping Expert", icon: Compass, end: false },
+  { to: "/model", label: "Market Model Engine", icon: LineChart, end: true },
   { to: "/templates", label: "Templates", icon: LayoutTemplate },
   { to: "/exports", label: "Exports", icon: Download },
   { to: "/settings", label: "Settings", icon: Settings },
@@ -25,11 +24,11 @@ export default function Sidebar() {
         </div>
       </div>
       <nav className="flex-1 p-3 space-y-1">
-        {items.map(({ to, label, icon: Icon }) => (
+        {items.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
-            end={to === "/"}
+            end={end}
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",

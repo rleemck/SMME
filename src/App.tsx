@@ -5,7 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ModelProvider } from "@/store/ModelStore";
 import AppLayout from "@/components/layout/AppLayout";
-import Index from "./pages/Index";
+import Home from "./pages/Home";
+import ScopingMarketDefinition from "./pages/ScopingMarketDefinition";
 import ScopingExpert from "./pages/ScopingExpert";
 import RevenueMapping from "./pages/RevenueMapping";
 import ModelEngine from "./pages/ModelEngine";
@@ -25,8 +26,9 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route element={<AppLayout />}>
-              <Route path="/" element={<Index />} />
-              <Route path="/scoping" element={<ScopingExpert />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/scoping" element={<ScopingMarketDefinition />} />
+              <Route path="/scoping/vendors" element={<ScopingExpert />} />
               <Route path="/revenue" element={<RevenueMapping />} />
               <Route path="/model" element={<ModelEngine />} />
               <Route path="/templates" element={<Templates />} />

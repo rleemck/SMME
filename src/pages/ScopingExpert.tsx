@@ -42,8 +42,16 @@ export default function ScopingExpert() {
       </div>
       <div className="flex items-end justify-between mb-6 gap-4 flex-wrap">
         <div>
-          <div className="mds-eyebrow mb-1">Step 1 · Software Scoping Expert</div>
+          <div className="mds-eyebrow mb-1">Software Scoping Expert · Step 2</div>
           <h1 className="text-2xl font-semibold text-mds-navy">Vendor universe & taxonomy mapping</h1>
+          <Button
+            type="button"
+            variant="link"
+            className="h-auto p-0 mt-1 text-xs text-mds-blue"
+            onClick={() => navigate("/scoping")}
+          >
+            ← Back to market definition
+          </Button>
           <p className="text-sm text-muted-foreground mt-1">
             {primarySegment
               ? `${selectedSegments.length} segment(s) · SEC total company revenue · ${market.timeframe}`
