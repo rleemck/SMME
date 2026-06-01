@@ -1,0 +1,172 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { useModel } from "@/store/ModelStore";
+import { taxonomy } from "@/lib/mockData";
+import { Plus, Trash2, Sparkles, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+export default function ScopingExpert() {
+  const { vendors, setVendors, market } = useModel();
+  const navigate = useNavigate();
+  const [selected, setSelected] = useState("Cloud Security");
+
+  const remove = (id: string) => setVendors(vendors.filter((v) => v.id !== id));
+  const addStub = () => {
+    const i = vendors.length + 1;
+    setVendors([...vendors, { id: `v${i}`, name: `New Vendor ${i}`, ticker: "—", filingType: "10-K", revenue: 0, segment: selected, confidence: 0.5, coverage: 0, status: "Pending", growth: 0, share: 0 }]);
+  };
+
+  return (
+    <div className="p-8 animate-fade-in">
+      <div className="flex items-end justify-between mb-6">
+        <div>
+          <div className="mds-eyebrow mb-1">Step 1 · Scoping</div>
+          <h1 className="text-2xl font-semibold text-mds-navy">Software Scoping Expert</h1>
+          <p className="text-sm text-muted-foreground mt-1">Mapping "{market.description}" to taxonomy segments and vendor universe.</p>
+        </div>
+        <Button onClick={() => navigate("/revenue")} className="gap-2">
+          Continue to Revenue Mapping <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-12 gap-6">
+        {/* Left: Taxonomy */}
+        <div className="col-span-5 space-y-5">
+          <Panel title="Taxonomy Mapping">
+            <div className="space-y-3">
+              <Row label="Primary Segment" value={<Badge className="bg-mds-blue hover:bg-mds-blue">{taxonomy.primary}</Badge>} />
+              <Row label="Subsegments" value={
+                <div className="flex flex-wrap gap-1.5">
+                  {taxonomy.subsegments.map((s) => (
+                    <button key={s} onClick={() => setSelected(s)}
+                      className={`text-xs px-2 py-1 rounded border transition ${selected === s ? "bg-mds-navy text-white border-mds-navy" : "bg-surface-muted hover:bg-secondary"}`}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              } />
+              <Row label="Keywords" value={
+                <div className="flex flex-wrap gap-1">
+                  {taxonomy.keywords.map((k) => <span key={k} className="text-[11px] px-2 py-0.5 rounded bg-surface-muted border text-muted-foreground">{k}</span>)}
+                </div>
+              } />
+            </div>
+          </Panel>
+
+          <Panel title="Hierarchy Tree">
+            <pre className="text-xs font-mono leading-6 text-mds-navy bg-surface-muted rounded p-4 border overflow-x-auto">
+{`Cybersecurity
+├ Cloud Security
+│  ├ CSPM / CWPP / CNAPP
+│  └ SASE
+├ IAM
+│  ├ Workforce Identity
+│  └ Customer Identity
+├ Endpoint Security
+│  ├ EDR / XDR
+│  └ MDM
+└ Network Security
+   └ Firewall / Zero Trust`}
+            </pre>
+          </Panel>
+        </div>
+
+        {/* Right: Vendors */}
+        <div className="col-span-7 space-y-5">
+          <Panel
+            title="Vendor Recommendations"
+            action={
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={addStub} className="gap-1"><Plus className="h-3.5 w-3.5" />Add Vendor</Button>
+              </div>
+            }
+          >
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Vendor</TableHead>
+                  <TableHead>Confidence</TableHead>
+                  <TableHead>Coverage</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {vendors.map((v) => (
+                  <TableRow key={v.id}>
+                    <TableCell className="font-medium">{v.name}<div className="text-xs text-muted-foreground">{v.segment}</div></TableCell>
+                    <TableCell><ConfidenceBar v={v.confidence} /></TableCell>
+                    <TableCell><span className="text-sm">{Math.round(v.coverage * 100)}%</span></TableCell>
+                    <TableCell><StatusBadge status={v.status} /></TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" onClick={() => remove(v.id)}><Trash2 className="h-4 w-4 text-mds-danger" /></Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Panel>
+
+          <Panel title="AI Reasoning" icon={<Sparkles className="h-4 w-4 text-mds-blue" />}>
+            <div className="space-y-3 text-sm">
+              <Reason label="Taxonomy Match">"Cloud Security" maps to <b>Cybersecurity → Cloud Security</b> with 0.94 confidence. Adjacent segments IAM and Endpoint are included as boundary expansions.</Reason>
+              <Reason label="Vendor Selection">CrowdStrike, Palo Alto, Zscaler, Okta selected based on revenue scale and segment overlap ≥ 0.70. SentinelOne added for endpoint depth; Fortinet flagged Pending due to mixed network/cloud revenue.</Reason>
+              <Reason label="Market Boundaries">Excluded: pure consumer AV, MSSP services, hardware appliances. Included: SaaS-delivered software, subscription license revenue, cloud-native control planes.</Reason>
+            </div>
+          </Panel>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Panel({ title, children, action, icon }: any) {
+  return (
+    <div className="rounded-lg border bg-card shadow-sm">
+      <div className="flex items-center justify-between px-5 py-3 border-b">
+        <div className="flex items-center gap-2">
+          {icon}
+          <h3 className="text-sm font-semibold text-mds-navy">{title}</h3>
+        </div>
+        {action}
+      </div>
+      <div className="p-5">{children}</div>
+    </div>
+  );
+}
+function Row({ label, value }: any) {
+  return (
+    <div className="flex items-start gap-4">
+      <div className="w-32 shrink-0 text-xs uppercase tracking-wide text-muted-foreground pt-1">{label}</div>
+      <div className="flex-1">{value}</div>
+    </div>
+  );
+}
+function ConfidenceBar({ v }: { v: number }) {
+  return (
+    <div className="flex items-center gap-2 w-32">
+      <div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
+        <div className="h-full bg-mds-blue" style={{ width: `${v * 100}%` }} />
+      </div>
+      <span className="text-xs text-muted-foreground tabular-nums">{(v * 100).toFixed(0)}%</span>
+    </div>
+  );
+}
+function StatusBadge({ status }: { status: string }) {
+  const map: any = {
+    Included: "bg-mds-success/10 text-mds-success border-mds-success/20",
+    Pending: "bg-mds-warning/10 text-yellow-700 border-mds-warning/30",
+    Excluded: "bg-muted text-muted-foreground border-border",
+  };
+  return <span className={`text-[11px] px-2 py-0.5 rounded border ${map[status]}`}>{status}</span>;
+}
+function Reason({ label, children }: any) {
+  return (
+    <div className="border-l-2 border-mds-blue pl-3 py-1">
+      <div className="text-[11px] font-semibold uppercase tracking-wide text-mds-blue">{label}</div>
+      <div className="text-sm text-mds-navy mt-1">{children}</div>
+    </div>
+  );
+}

@@ -1,0 +1,71 @@
+import { createContext, useContext, useMemo, useState, ReactNode } from "react";
+import { Assumption, IssueNode, Vendor, initialAssumptions, initialTree, initialVendors } from "@/lib/mockData";
+
+type Market = {
+  name: string;
+  description: string;
+  geography: string;
+  timeframe: string;
+};
+
+type Ctx = {
+  market: Market;
+  setMarket: (m: Partial<Market>) => void;
+  vendors: Vendor[];
+  setVendors: (v: Vendor[]) => void;
+  assumptions: Assumption[];
+  setAssumption: (id: string, value: number) => void;
+  resetAssumptions: () => void;
+  tree: IssueNode;
+  setTree: (t: IssueNode) => void;
+  tam: number;
+  baseRevenue: number;
+  copilotOpen: boolean;
+  setCopilotOpen: (b: boolean) => void;
+};
+
+const ModelContext = createContext<Ctx | null>(null);
+
+export function ModelProvider({ children }: { children: ReactNode }) {
+  const [market, setMarketState] = useState<Market>({
+    name: "Cloud Security Software",
+    description: "Cloud Security Software",
+    geography: "Global",
+    timeframe: "2024–2028",
+  });
+  const [vendors, setVendors] = useState<Vendor[]>(initialVendors);
+  const [assumptions, setAssumptions] = useState<Assumption[]>(initialAssumptions);
+  const [tree, setTree] = useState<IssueNode>(initialTree);
+  const [copilotOpen, setCopilotOpen] = useState(false);
+
+  const setMarket = (m: Partial<Market>) => setMarketState((s) => ({ ...s, ...m }));
+  const setAssumption = (id: string, value: number) =>
+    setAssumptions((arr) => arr.map((a) => (a.id === id ? { ...a, value } : a)));
+  const resetAssumptions = () =>
+    setAssumptions((arr) => arr.map((a) => ({ ...a, value: a.defaultValue })));
+
+  const { tam, baseRevenue } = useMemo(() => {
+    const included = vendors.filter((v) => v.status === "Included");
+    const base = included.reduce((s, v) => s + v.revenue, 0);
+    const growth = (assumptions.find((a) => a.name === "Growth Rate")?.value ?? 14) / 100;
+    const penetration = (assumptions.find((a) => a.name === "Penetration Rate")?.value ?? 60) / 100;
+    const expansion = assumptions.find((a) => a.name === "Expansion Factor")?.value ?? 1.15;
+    const tamVal = (base / Math.max(penetration, 0.01)) * (1 + growth) * expansion;
+    return { tam: tamVal, baseRevenue: base };
+  }, [vendors, assumptions]);
+
+  return (
+    <ModelContext.Provider value={{ market, setMarket, vendors, setVendors, assumptions, setAssumption, resetAssumptions, tree, setTree, tam, baseRevenue, copilotOpen, setCopilotOpen }}>
+      {children}
+    </ModelContext.Provider>
+  );
+}
+
+export const useModel = () => {
+  const ctx = useContext(ModelContext);
+  if (!ctx) throw new Error("useModel must be used within ModelProvider");
+  return ctx;
+};
+
+export const fmtUsdB = (m: number) => `$${(m / 1000).toFixed(2)}B`;
+export const fmtUsdM = (m: number) => `$${m.toLocaleString(undefined, { maximumFractionDigits: 0 })}M`;

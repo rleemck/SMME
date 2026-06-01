@@ -1,0 +1,94 @@
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { useModel, fmtUsdB, fmtUsdM } from "@/store/ModelStore";
+import { TrendingUp, ChevronRight, Edit3 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+export default function RevenueMapping() {
+  const { vendors, setVendors, tam, baseRevenue } = useModel();
+  const navigate = useNavigate();
+  const included = vendors.filter((v) => v.status === "Included");
+
+  const updateRev = (id: string, val: number) =>
+    setVendors(vendors.map((v) => (v.id === id ? { ...v, revenue: val } : v)));
+
+  return (
+    <div className="p-8 animate-fade-in">
+      <div className="flex items-end justify-between mb-6">
+        <div>
+          <div className="mds-eyebrow mb-1">Step 2 · Ingestion</div>
+          <h1 className="text-2xl font-semibold text-mds-navy">Revenue Mapping</h1>
+          <p className="text-sm text-muted-foreground mt-1">Public filings normalized to segment-level revenue.</p>
+        </div>
+        <Button onClick={() => navigate("/model")} className="gap-2">
+          Open Model Engine <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <Kpi label="Vendors Included" value={`${included.length}`} sub={`${vendors.length} total mapped`} />
+        <Kpi label="Revenue Coverage" value={`${Math.round((included.reduce((s, v) => s + v.coverage, 0) / Math.max(included.length, 1)) * 100)}%`} sub="Weighted avg" />
+        <Kpi label="Aggregate Vendor Revenue" value={fmtUsdM(baseRevenue)} sub="Sum of included" />
+        <Kpi accent label="Preliminary TAM" value={fmtUsdB(tam)} sub={<span className="text-mds-success inline-flex items-center gap-1"><TrendingUp className="h-3 w-3" /> +14.0% CAGR</span>} />
+      </div>
+
+      <div className="rounded-lg border bg-card shadow-sm">
+        <div className="px-5 py-3 border-b flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-mds-navy">Vendor Revenue Table</h3>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="gap-1"><Edit3 className="h-3.5 w-3.5" />Revenue Override</Button>
+            <Button variant="outline" size="sm">Vendor Allocation Editor</Button>
+          </div>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Vendor</TableHead>
+              <TableHead>Ticker</TableHead>
+              <TableHead>Filing</TableHead>
+              <TableHead className="text-right">Revenue ($M)</TableHead>
+              <TableHead>Segment Mapping</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {vendors.map((v) => (
+              <TableRow key={v.id}>
+                <TableCell className="font-medium">{v.name}</TableCell>
+                <TableCell><span className="font-mono text-xs">{v.ticker}</span></TableCell>
+                <TableCell><span className="text-xs px-2 py-0.5 rounded bg-surface-muted border">{v.filingType}</span></TableCell>
+                <TableCell className="text-right">
+                  <Input
+                    type="number"
+                    value={v.revenue}
+                    onChange={(e) => updateRev(v.id, Number(e.target.value))}
+                    className="h-8 w-28 ml-auto text-right tabular-nums"
+                  />
+                </TableCell>
+                <TableCell><span className="text-sm">{v.segment}</span></TableCell>
+                <TableCell>
+                  <span className={`text-[11px] px-2 py-0.5 rounded border ${
+                    v.status === "Included" ? "bg-mds-success/10 text-mds-success border-mds-success/20" :
+                    v.status === "Pending" ? "bg-mds-warning/10 text-yellow-700 border-mds-warning/30" :
+                    "bg-muted text-muted-foreground"
+                  }`}>{v.status}</span>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}
+
+function Kpi({ label, value, sub, accent }: any) {
+  return (
+    <div className={`mds-kpi ${accent ? "bg-mds-navy text-white border-mds-navy" : ""}`}>
+      <div className={`mds-eyebrow ${accent ? "text-white/60" : ""}`}>{label}</div>
+      <div className={`text-2xl font-semibold mt-2 tabular-nums ${accent ? "text-white" : "text-mds-navy"}`}>{value}</div>
+      <div className={`text-xs mt-1 ${accent ? "text-white/70" : "text-muted-foreground"}`}>{sub}</div>
+    </div>
+  );
+}
