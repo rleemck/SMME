@@ -1,7 +1,10 @@
 import { useMemo, useState } from "react";
 import { MoreVertical, Plus, Trash2, X } from "lucide-react";
+import ExcelJS from "exceljs";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useModel } from "@/store/ModelStore";
+import type { Vendor } from "@/lib/mockData";
 
 type NodeKind = "data" | "assumption" | "calculation" | "flow";
 type Operator = "×" | "÷" | "+" | "−" | "=";
@@ -29,18 +32,50 @@ type TreeItem = {
   node: ModelNode;
   children: TreeItem[];
   depth: number;
-  row: number;
-  rowSpan: number;
+};
+
+type LayoutItem = TreeItem & {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  subtreeHeight: number;
+  children: LayoutItem[];
+};
+
+type TreeLayout = {
+  items: LayoutItem[];
+  width: number;
+  height: number;
 };
 
 type MetricValues = Record<string, number>;
 
+type ValidationCheck = {
+  name: string;
+  passed: boolean;
+  details: string[];
+};
+
+type ValidationReport = {
+  checks: ValidationCheck[];
+  missingAssumptions: string[];
+  unresolvedCalculations: string[];
+  circularReferences: string[];
+  emptyVendorFields: string[];
+  emptySources: string[];
+  canExport: boolean;
+};
+
 const NODE_WIDTH = 280;
-const COLUMN_GAP = 88;
-const ROW_HEIGHT = 190;
-const CARD_MIN_HEIGHT = 152;
+const NODE_HEIGHT = 240;
+const COLUMN_GAP = 120;
+const SIBLING_GAP = 24;
 const OPERATORS: Operator[] = ["×", "÷", "+", "−", "="];
 const UNITS: Unit[] = ["%", "$", "count", "ratio", "$/yr"];
+const US_TOTAL_FIRMS = 6_395_635;
+const SEATS_PER_COMPANY = 21.22516481944326;
+const CENSUS_TOTAL_FIRMS_FILTER = "U.S. total Firms: State = 0, all industries, enterprise size '01: Total'";
 
 const KIND_STYLE = {
   data: {
@@ -50,9 +85,9 @@ const KIND_STYLE = {
     label: "DATA INPUT",
   },
   assumption: {
-    dot: "bg-mds-danger",
-    border: "border-l-mds-danger",
-    text: "text-mds-danger",
+    dot: "bg-destructive",
+    border: "border-l-destructive",
+    text: "text-destructive",
     label: "ASSUMPTION",
   },
   calculation: {
@@ -89,10 +124,10 @@ const INITIAL_NODES: ModelNode[] = [
     kind: "data",
     title: "# of Companies in the US",
     operator: "×",
-    value: 380000,
+    value: US_TOTAL_FIRMS,
     unit: "count",
-    description: "By number of FTE by industry; full universe of potential buyers.",
-    source: "US Census Bureau, CapIQ",
+    description: CENSUS_TOTAL_FIRMS_FILTER,
+    source: "Hackathon_Model_Template.xlsx · Assumptions!C7",
     order: 0,
     editableValue: true,
     protected: true,
@@ -118,10 +153,10 @@ const INITIAL_NODES: ModelNode[] = [
     kind: "data",
     title: "# users per company",
     operator: "×",
-    value: 120,
+    value: SEATS_PER_COMPANY,
     unit: "count",
-    description: "Average number of IAM-eligible users per company.",
-    source: "BLS, Expert interviews, Survey",
+    description: "Seats per company = U.S. total Employment / Number of companies.",
+    source: "Hackathon_Model_Template.xlsx · Assumptions!C8",
     order: 0,
     editableValue: true,
     protected: true,
@@ -229,12 +264,14 @@ const INITIAL_NODES: ModelNode[] = [
 ];
 
 export default function MarketModelCanvas() {
+  const { vendors } = useModel();
   const [nodes, setNodes] = useState<ModelNode[]>(INITIAL_NODES);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [draftParentId, setDraftParentId] = useState<string | null>(null);
   const [draft, setDraft] = useState<NodeDraft>(createDraft());
   const [saveError, setSaveError] = useState("");
+  const [validationReport, setValidationReport] = useState<ValidationReport | null>(null);
 
   const values = useMemo(() => calculateValues(nodes), [nodes]);
   const selectedNode = selectedNodeId ? nodes.find((node) => node.id === selectedNodeId) : undefined;
@@ -296,12 +333,26 @@ export default function MarketModelCanvas() {
     setOpenMenuId(null);
   };
 
+  const openExportReport = () => {
+    setValidationReport(validateExport(nodes, values, vendors));
+  };
+
+  const exportWorkbook = async () => {
+    try {
+      await exportMarketModelWorkbook(nodes, values, vendors);
+      setValidationReport(null);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Excel export failed.");
+    }
+  };
+
   return (
     <div className="flex h-full min-w-0 flex-col bg-background text-foreground">
-      <TopSummaryBar tam={tam} sam={sam} vendedSam={vendedSam} />
+      <TopSummaryBar tam={tam} sam={sam} vendedSam={vendedSam} onExport={openExportReport} />
 
-      <main className="min-h-0 min-w-0 flex-1 overflow-auto bg-background canvas-dot-grid">
-        <div className="min-w-[980px] px-8 pb-10 pt-4">
+      <main className="relative min-h-0 min-w-0 flex-1 overflow-auto bg-background canvas-dot-grid">
+        <Legend />
+        <div className="min-w-[980px] px-8 pb-10 pt-4 pr-64">
           <Breadcrumb />
           <div className="space-y-3">
             <TierBand
@@ -320,7 +371,7 @@ export default function MarketModelCanvas() {
               onValueChange={(id, value) => updateNode(id, { value: parseInputNumber(value) })}
             />
 
-            <FlowIndicator label={`TAM: ${formatMarketValue(tam)} flows in ↓`} />
+            <CrossTierFlowLink label={`TAM: ${formatMarketValue(tam)} flows to Tier 2`} />
 
             <TierBand
               tone="sam"
@@ -338,7 +389,7 @@ export default function MarketModelCanvas() {
               onValueChange={(id, value) => updateNode(id, { value: parseInputNumber(value) })}
             />
 
-            <FlowIndicator label={`SAM: ${formatMarketValue(sam)} flows in ↓`} />
+            <CrossTierFlowLink label={`SAM: ${formatMarketValue(sam)} flows to Tier 3`} />
 
             <TierBand
               tone="vended"
@@ -385,6 +436,8 @@ export default function MarketModelCanvas() {
           }}
         />
       )}
+
+      {validationReport && <ValidationReportModal report={validationReport} onClose={() => setValidationReport(null)} onExport={exportWorkbook} />}
     </div>
   );
 }
@@ -397,15 +450,24 @@ function Breadcrumb() {
   );
 }
 
-function TopSummaryBar({ tam, sam, vendedSam }: { tam: number; sam: number; vendedSam: number }) {
+function TopSummaryBar({ tam, sam, vendedSam, onExport }: { tam: number; sam: number; vendedSam: number; onExport: () => void }) {
   const samPct = tam ? (sam / tam) * 100 : 0;
   const vendedPct = sam ? (vendedSam / sam) * 100 : 0;
 
   return (
-    <div className="z-20 grid grid-cols-3 bg-mds-navy text-primary-foreground shadow-sm">
+    <div className="z-20 grid grid-cols-[1fr_1fr_1fr_auto] bg-mds-navy text-primary-foreground shadow-sm">
       <MetricBlock label="TAM" value={formatMarketValue(tam)} line1="Total addressable" line2="IAM · US · 2025" />
       <MetricBlock label="SAM" value={formatMarketValue(sam)} line1="Serviceable addressable" line2={`${samPct.toFixed(1)}% of TAM`} />
       <MetricBlock label="Vended SAM" value={formatMarketValue(vendedSam)} line1="Current vended spend" line2={`${vendedPct.toFixed(1)}% of SAM`} />
+      <div className="flex items-center px-6">
+        <button
+          type="button"
+          className="rounded-md border border-primary-foreground/30 px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-foreground/10"
+          onClick={onExport}
+        >
+          Export to Excel
+        </button>
+      </div>
     </div>
   );
 }
@@ -417,6 +479,31 @@ function MetricBlock({ label, value, line1, line2 }: { label: string; value: str
       <div className="mt-2 text-[32px] font-bold leading-none text-primary-foreground">{value}</div>
       <div className="mt-2 text-[13px] leading-tight text-primary-foreground/70">{line1}</div>
       <div className="mt-1 text-xs leading-tight text-primary-foreground/50">{line2}</div>
+    </div>
+  );
+}
+
+function Legend() {
+  return (
+    <aside className="absolute right-8 top-4 z-30 h-fit w-56 rounded-xl border bg-card p-4 shadow-sm">
+      <div className="mb-3 text-sm font-semibold text-foreground">Legend</div>
+      <LegendRow tone="data" label="Data Input" description="External facts or editable source values." />
+      <LegendRow tone="assumption" label="Assumption" description="Analyst judgment driving model scenarios." />
+      <LegendRow tone="calculation" label="Calculation" description="Computed output from connected drivers." />
+    </aside>
+  );
+}
+
+function LegendRow({ tone, label, description }: { tone: "data" | "assumption" | "calculation"; label: string; description: string }) {
+  const style = KIND_STYLE[tone];
+
+  return (
+    <div className="mb-3 flex gap-2 last:mb-0">
+      <span className={cn("mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full", style.dot)} />
+      <div>
+        <div className={cn("text-xs font-bold", style.text)}>{label}</div>
+        <div className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{description}</div>
+      </div>
     </div>
   );
 }
@@ -453,9 +540,7 @@ function TierBand({
   const tree = useMemo(() => createTree(nodes, rootId), [nodes, rootId]);
   if (!tree) return null;
 
-  const items = flattenTree(tree);
-  const maxDepth = Math.max(...items.map((item) => item.depth));
-  const rowCount = Math.max(...items.map((item) => item.row)) + 1;
+  const layout = layoutTree(tree);
   const bandStyle = {
     tam: "border-border bg-surface-muted",
     sam: "border-mds-success/30 bg-mds-success/5",
@@ -478,19 +563,20 @@ function TierBand({
       <div
         className="relative"
         style={{
-          width: (maxDepth + 1) * NODE_WIDTH + maxDepth * COLUMN_GAP,
-          minHeight: rowCount * ROW_HEIGHT,
+          width: layout.width,
+          minHeight: layout.height,
         }}
       >
-        <TreeConnectors items={items} />
-        {items.map((item) => (
+        <TreeConnectors items={layout.items} />
+        {layout.items.map((item) => (
           <div
             key={item.node.id}
             className="absolute z-10"
             style={{
-              left: item.depth * (NODE_WIDTH + COLUMN_GAP),
-              top: item.row * ROW_HEIGHT + ((item.rowSpan - 1) * ROW_HEIGHT) / 2,
-              width: NODE_WIDTH,
+              left: item.x,
+              top: item.y,
+              width: item.width,
+              height: item.height,
             }}
           >
             <NodeCard
@@ -533,13 +619,15 @@ function NodeCard({
   onValueChange: (value: string) => void;
 }) {
   const style = KIND_STYLE[node.kind];
-  const isCalculated = node.kind === "calculation" || node.kind === "flow";
+  const isCalculation = node.kind === "calculation";
+  const isFlow = node.kind === "flow";
 
   return (
     <div
       className={cn(
-        "min-h-[152px] rounded-[10px] border border-l-4 bg-card px-5 py-4 shadow-sm transition hover:-translate-y-px hover:shadow-md",
+        "h-full rounded-[10px] border border-l-4 bg-card px-5 py-4 shadow-sm transition hover:-translate-y-px hover:shadow-md",
         style.border,
+        node.kind === "assumption" && "border-destructive/40 bg-destructive/5",
         selected && "ring-2 ring-primary ring-offset-2 ring-offset-background",
       )}
       onClick={onSelect}
@@ -576,17 +664,28 @@ function NodeCard({
 
       <div className="mt-3">
         {node.editableValue ? (
-          <div className="flex h-10 items-center rounded-md border border-input bg-background px-2">
+          <div
+            className="flex h-10 items-center rounded-md border border-input bg-background px-2"
+            onClick={(event) => event.stopPropagation()}
+            onMouseDown={(event) => event.stopPropagation()}
+          >
             {node.unit === "$" && <span className="text-sm font-semibold text-muted-foreground">$</span>}
             <Input
               value={String(node.value)}
               onChange={(event) => onValueChange(event.target.value)}
-              className="h-9 border-0 bg-transparent px-1 text-left text-lg font-semibold text-foreground shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              onClick={(event) => event.stopPropagation()}
+              onFocus={(event) => event.stopPropagation()}
+              className={cn(
+                "h-9 border-0 bg-transparent px-1 text-left text-lg font-semibold shadow-none focus-visible:ring-0 focus-visible:ring-offset-0",
+                node.kind === "assumption" ? "text-mds-danger" : "text-foreground",
+              )}
             />
             {node.unit !== "$" && <span className="text-xs font-medium text-muted-foreground">{node.unit}</span>}
           </div>
         ) : (
-          <div className={cn("text-2xl font-bold leading-tight", isCalculated ? "text-mds-success" : "text-foreground")}>{formatValue(displayValue, node.unit)}</div>
+          <div className={cn("text-2xl font-bold leading-tight", isCalculation && "text-mds-success", isFlow && "text-muted-foreground", !isCalculation && !isFlow && "text-foreground")}>
+            {formatValue(displayValue, node.unit)}
+          </div>
         )}
       </div>
 
@@ -631,40 +730,57 @@ function MenuButton({
   );
 }
 
-function TreeConnectors({ items }: { items: TreeItem[] }) {
-  const byId = new Map(items.map((item) => [item.node.id, item]));
-  const links = items.flatMap((item) =>
-    item.children.map((child) => ({
-      parent: item,
-      child: byId.get(child.node.id) ?? child,
-    })),
-  );
+function TreeConnectors({ items }: { items: LayoutItem[] }) {
+  const parents = items.filter((item) => item.children.length > 0);
 
   return (
     <svg className="pointer-events-none absolute inset-0 z-0 h-full w-full overflow-visible text-border" aria-hidden="true">
-      {links.map(({ parent, child }) => {
-        const parentX = parent.depth * (NODE_WIDTH + COLUMN_GAP) + NODE_WIDTH;
-        const childX = child.depth * (NODE_WIDTH + COLUMN_GAP);
+      {parents.map((parent) => {
+        const parentX = parent.x + parent.width;
         const trunkX = parentX + COLUMN_GAP / 2;
-        const parentY = parent.row * ROW_HEIGHT + ((parent.rowSpan - 1) * ROW_HEIGHT) / 2 + CARD_MIN_HEIGHT / 2;
-        const childY = child.row * ROW_HEIGHT + CARD_MIN_HEIGHT / 2;
+        const parentY = parent.y + parent.height / 2;
+        const childCenters = parent.children.map((child) => child.y + child.height / 2);
+        const minChildY = Math.min(...childCenters);
+        const maxChildY = Math.max(...childCenters);
 
         return (
-          <g key={`${parent.node.id}-${child.node.id}`}>
+          <g key={parent.node.id}>
             <path
-              d={`M ${parentX} ${parentY} H ${trunkX} V ${childY} H ${childX}`}
+              d={`M ${parentX} ${parentY} H ${trunkX} M ${trunkX} ${minChildY} V ${maxChildY}`}
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-            <OperatorBadge x={trunkX} y={childY} symbol={child.node.operator} />
+            {parent.children.map((child) => {
+              const childX = child.x;
+              const childY = child.y + child.height / 2;
+
+              return (
+                <path
+                  key={child.node.id}
+                  d={`M ${trunkX} ${childY} H ${childX}`}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              );
+            })}
+            <OperatorBadge x={trunkX} y={parentY} symbol={getGroupOperator(parent.children)} />
           </g>
         );
       })}
     </svg>
   );
+}
+
+function getGroupOperator(children: LayoutItem[]): Operator {
+  const operators = children.map((child) => child.node.operator);
+  const [firstOperator] = operators;
+  return operators.every((operator) => operator === firstOperator) ? firstOperator : "=";
 }
 
 function OperatorBadge({ x, y, symbol }: { x: number; y: number; symbol: Operator }) {
@@ -847,11 +963,88 @@ function Field({ label, error, children }: { label: string; error?: string; chil
   );
 }
 
-function FlowIndicator({ label }: { label: string }) {
+function ValidationReportModal({ report, onClose, onExport }: { report: ValidationReport; onClose: () => void; onExport: () => void }) {
+  const totalChecks = report.checks.length;
+  const passedChecks = report.checks.filter((check) => check.passed).length;
+  const failedChecks = totalChecks - passedChecks;
+
   return (
-    <div className="flex items-center gap-3 pl-24 text-[10px] font-semibold text-muted-foreground">
-      <span className="h-4 border-l-2 border-dashed border-muted-foreground/60" />
-      <span>{label}</span>
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-mds-navy/55 px-4 py-8" role="dialog" aria-modal="true" aria-labelledby="validation-report-title" onMouseDown={onClose}>
+      <div className="w-full max-w-[720px] rounded-xl border bg-card p-6 shadow-xl" onMouseDown={(event) => event.stopPropagation()}>
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">Excel Export Validation</div>
+            <h2 id="validation-report-title" className="mt-1 text-xl font-semibold text-foreground">
+              {report.canExport ? "Workbook is ready to export" : "Export blocked"}
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {totalChecks} checks run · {passedChecks} passed · {failedChecks} failed
+            </p>
+          </div>
+          <button type="button" className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground" onClick={onClose} aria-label="Close validation report">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          {report.checks.map((check) => (
+            <div key={check.name} className={cn("rounded-lg border p-3", check.passed ? "border-mds-success/30 bg-mds-success/5" : "border-destructive/30 bg-destructive/5")}>
+              <div className={cn("text-sm font-semibold", check.passed ? "text-mds-success" : "text-destructive")}>
+                {check.passed ? "Passed" : "Failed"} · {check.name}
+              </div>
+              {check.details.length > 0 && (
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground">
+                  {check.details.map((detail) => (
+                    <li key={detail}>{detail}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 flex justify-end gap-2">
+          <button type="button" className="rounded-md border px-4 py-2 text-sm font-semibold hover:bg-muted" onClick={onClose}>
+            Close
+          </button>
+          <button
+            type="button"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-mds-blue-hover disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={!report.canExport}
+            onClick={onExport}
+          >
+            Download Workbook
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CrossTierFlowLink({ label }: { label: string }) {
+  const tierPadding = 24;
+  const sourceCenterX = tierPadding + NODE_WIDTH / 2;
+  const targetCenterX = tierPadding + NODE_WIDTH + COLUMN_GAP + NODE_WIDTH / 2;
+  const startY = 0;
+  const elbowY = 26;
+  const endY = 52;
+
+  return (
+    <div className="relative h-14 text-[10px] font-semibold text-muted-foreground">
+      <svg className="absolute left-0 top-0 h-14 overflow-visible text-border" style={{ width: targetCenterX + NODE_WIDTH / 2 }} aria-hidden="true">
+        <path
+          d={`M ${sourceCenterX} ${startY} V ${elbowY} H ${targetCenterX} V ${endY}`}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeDasharray="4 4"
+        />
+      </svg>
+      <span className="absolute top-5 rounded-full bg-background px-2 py-0.5" style={{ left: targetCenterX + 16 }}>
+        {label}
+      </span>
     </div>
   );
 }
@@ -864,31 +1057,69 @@ function createTree(nodes: ModelNode[], rootId: string): TreeItem | null {
   });
   byParent.forEach((children) => children.sort((a, b) => a.order - b.order));
 
-  let row = 0;
   const build = (node: ModelNode, depth: number): TreeItem => {
     const children = (byParent.get(node.id) ?? []).map((child) => build(child, depth + 1));
-    if (!children.length) {
-      return { node, children, depth, row: row++, rowSpan: 1 };
-    }
-
-    const rowSpan = children.reduce((sum, child) => sum + child.rowSpan, 0);
-    const firstChild = children[0];
-    const lastChild = children[children.length - 1];
-    return {
-      node,
-      children,
-      depth,
-      row: Math.round((firstChild.row + lastChild.row) / 2),
-      rowSpan,
-    };
+    return { node, children, depth };
   };
 
   const root = nodes.find((node) => node.id === rootId);
   return root ? build(root, 0) : null;
 }
 
-function flattenTree(tree: TreeItem): TreeItem[] {
-  return [tree, ...tree.children.flatMap(flattenTree)];
+function layoutTree(tree: TreeItem): TreeLayout {
+  const measure = (item: TreeItem): LayoutItem => {
+    const children = item.children.map(measure);
+    const childrenHeight = children.reduce((sum, child, index) => sum + child.subtreeHeight + (index === 0 ? 0 : SIBLING_GAP), 0);
+    const subtreeHeight = Math.max(NODE_HEIGHT, childrenHeight);
+
+    return {
+      ...item,
+      children,
+      x: item.depth * (NODE_WIDTH + COLUMN_GAP),
+      y: 0,
+      width: NODE_WIDTH,
+      height: NODE_HEIGHT,
+      subtreeHeight,
+    };
+  };
+
+  const place = (item: LayoutItem, top: number): LayoutItem => {
+    if (!item.children.length) {
+      return { ...item, y: top };
+    }
+
+    const childrenTotalHeight = item.children.reduce((sum, child, index) => sum + child.subtreeHeight + (index === 0 ? 0 : SIBLING_GAP), 0);
+    let childTop = top + (item.subtreeHeight - childrenTotalHeight) / 2;
+    const children = item.children.map((child) => {
+      const placedChild = place(child, childTop);
+      childTop += child.subtreeHeight + SIBLING_GAP;
+      return placedChild;
+    });
+    const firstChild = children[0];
+    const lastChild = children[children.length - 1];
+    const childrenCenterY = (firstChild.y + firstChild.height / 2 + lastChild.y + lastChild.height / 2) / 2;
+
+    return {
+      ...item,
+      children,
+      y: Math.max(top, childrenCenterY - item.height / 2),
+    };
+  };
+
+  const root = place(measure(tree), 0);
+  const items = flattenLayout(root);
+  const maxRight = Math.max(...items.map((item) => item.x + item.width));
+  const maxBottom = Math.max(...items.map((item) => item.y + item.height));
+
+  return {
+    items,
+    width: maxRight,
+    height: Math.max(root.subtreeHeight, maxBottom),
+  };
+}
+
+function flattenLayout(tree: LayoutItem): LayoutItem[] {
+  return [tree, ...tree.children.flatMap(flattenLayout)];
 }
 
 function calculateValues(nodes: ModelNode[]) {
@@ -991,4 +1222,291 @@ function formatMarketValue(value: number) {
   if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
   if (value >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
   return `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
+
+function validateExport(nodes: ModelNode[], values: MetricValues, vendors: Vendor[]): ValidationReport {
+  const circularReferences = detectCircularReferences(nodes);
+  const missingAssumptions = nodes
+    .filter((node) => node.kind === "assumption" && (!Number.isFinite(node.value) || node.value === 0))
+    .map((node) => node.title);
+  const unresolvedCalculations = nodes
+    .filter((node) => (node.kind === "calculation" || node.kind === "flow") && !Number.isFinite(values[node.id]))
+    .map((node) => node.title);
+  const emptySources = nodes.filter((node) => !node.source.trim()).map((node) => node.title);
+  const emptyVendorFields = vendors.flatMap((vendor) => {
+    const issues: string[] = [];
+    if (!vendor.name?.trim()) issues.push(`${vendor.id}: missing vendor name`);
+    if (!vendor.segment?.trim()) issues.push(`${vendor.name}: missing segment`);
+    if (!vendor.filingSource?.trim() && !vendor.filingUrl?.trim() && !vendor.rationale?.trim()) issues.push(`${vendor.name}: missing source/rationale`);
+    return issues;
+  });
+
+  const checks: ValidationCheck[] = [
+    {
+      name: "Calculation nodes resolve",
+      passed: unresolvedCalculations.length === 0,
+      details: unresolvedCalculations.length ? unresolvedCalculations : ["All calculation and flow-in nodes resolve."],
+    },
+    {
+      name: "No circular dependencies",
+      passed: circularReferences.length === 0,
+      details: circularReferences.length ? circularReferences : ["No parent-child cycles detected."],
+    },
+    {
+      name: "Assumption values populated",
+      passed: missingAssumptions.length === 0,
+      details: missingAssumptions.length ? missingAssumptions : ["All assumption nodes have non-zero values."],
+    },
+    {
+      name: "Vendor list exportable",
+      passed: emptyVendorFields.length === 0,
+      details: emptyVendorFields.length
+        ? emptyVendorFields
+        : [vendors.length > 0 ? `${vendors.length} vendors ready for export.` : "No vendors included; Vendor List sheet will export empty."],
+    },
+    {
+      name: "Sources populated",
+      passed: emptySources.length === 0,
+      details: emptySources.length ? emptySources : ["All model nodes include sources."],
+    },
+  ];
+
+  return {
+    checks,
+    missingAssumptions,
+    unresolvedCalculations,
+    circularReferences,
+    emptyVendorFields,
+    emptySources,
+    canExport: checks.every((check) => check.passed),
+  };
+}
+
+function detectCircularReferences(nodes: ModelNode[]) {
+  const byId = new Map(nodes.map((node) => [node.id, node]));
+  const cycles: string[] = [];
+
+  nodes.forEach((node) => {
+    const seen = new Set<string>();
+    let current: ModelNode | undefined = node;
+
+    while (current?.parentId) {
+      if (seen.has(current.id)) {
+        cycles.push(`Cycle detected at ${current.title}`);
+        return;
+      }
+      seen.add(current.id);
+      current = byId.get(current.parentId);
+    }
+  });
+
+  return Array.from(new Set(cycles));
+}
+
+async function exportMarketModelWorkbook(nodes: ModelNode[], values: MetricValues, vendors: Vendor[]) {
+  const response = await fetch("/templates/Hackathon_Model_Template.xlsx");
+  if (!response.ok) throw new Error("Could not load Excel export template.");
+
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(await response.arrayBuffer());
+
+  const output = requireWorksheet(workbook, "Output");
+  const assumptions = requireWorksheet(workbook, "Assumptions");
+  const rawData = requireWorksheet(workbook, "Raw Data");
+  const vendorList = requireWorksheet(workbook, "Vendor List");
+  const sources = requireWorksheet(workbook, "Sources & Notes");
+  const sortedNodes = sortNodesForExport(nodes);
+  const leafCellById = populateTemplateInputs(assumptions, rawData, sortedNodes);
+
+  output.getCell("C14").value = { formula: createFormulaForNode("tam", nodes, leafCellById), result: values.tam };
+  output.getCell("C16").value = { formula: createFormulaForNode("sam", nodes, leafCellById), result: values.sam };
+  output.getCell("C18").value = { formula: createFormulaForNode("vended-sam", nodes, leafCellById), result: values["vended-sam"] };
+
+  populateVendorList(vendorList, vendors);
+  populateSourcesAndNotes(sources, sortedNodes, vendors);
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  downloadWorkbook(buffer, `market-model-export-${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
+
+function requireWorksheet(workbook: ExcelJS.Workbook, name: string) {
+  const worksheet = workbook.getWorksheet(name);
+  if (!worksheet) throw new Error(`Template is missing required sheet: ${name}`);
+  return worksheet;
+}
+
+function downloadWorkbook(buffer: ExcelJS.Buffer, fileName: string) {
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function sortNodesForExport(nodes: ModelNode[]) {
+  const roots = nodes.filter((node) => !node.parentId).sort((a, b) => a.order - b.order);
+  const byParent = new Map<string, ModelNode[]>();
+  nodes.forEach((node) => {
+    if (!node.parentId) return;
+    byParent.set(node.parentId, [...(byParent.get(node.parentId) ?? []), node]);
+  });
+  byParent.forEach((children) => children.sort((a, b) => a.order - b.order));
+
+  const walk = (node: ModelNode): ModelNode[] => [node, ...(byParent.get(node.id) ?? []).flatMap(walk)];
+  return roots.flatMap(walk);
+}
+
+function populateTemplateInputs(assumptions: ExcelJS.Worksheet, rawData: ExcelJS.Worksheet, nodes: ModelNode[]) {
+  const leafCellById = new Map<string, string>();
+  const baseAssumptionRows: Record<string, number> = {
+    companies: 7,
+    users: 8,
+    spend: 9,
+    "logo-penetration": 10,
+    "seat-adoption": 11,
+  };
+
+  Object.entries(baseAssumptionRows).forEach(([id, rowNumber]) => {
+    const node = nodes.find((item) => item.id === id);
+    if (!node) return;
+    assumptions.getCell(`B${rowNumber}`).value = node.title;
+    assumptions.getCell(`C${rowNumber}`).value = valueForWorkbook(node);
+    assumptions.getCell(`D${rowNumber}`).value = node.unit;
+    assumptions.getCell(`E${rowNumber}`).value = node.source;
+    assumptions.getCell(`F${rowNumber}`).value = node.description;
+    leafCellById.set(id, `'Assumptions'!$C$${rowNumber}`);
+  });
+
+  const dynamicAssumptions = nodes.filter((node) => node.kind === "assumption" && !baseAssumptionRows[node.id]);
+  dynamicAssumptions.forEach((node, index) => {
+    const rowNumber = 12 + index;
+    copyRowStyle(assumptions, 11, rowNumber);
+    assumptions.getCell(`B${rowNumber}`).value = node.title;
+    assumptions.getCell(`C${rowNumber}`).value = valueForWorkbook(node);
+    assumptions.getCell(`D${rowNumber}`).value = node.unit;
+    assumptions.getCell(`E${rowNumber}`).value = node.source;
+    assumptions.getCell(`F${rowNumber}`).value = node.description;
+    leafCellById.set(node.id, `'Assumptions'!$C$${rowNumber}`);
+  });
+
+  const dynamicDataInputs = nodes.filter((node) => node.kind === "data" && !baseAssumptionRows[node.id]);
+  if (dynamicDataInputs.length > 0) {
+    const startRow = rawData.rowCount + 2;
+    const headerRow = rawData.getRow(startRow);
+    ["Node ID", "Parent ID", "Title", "Value", "Unit", "Operator", "Description", "Source"].forEach((value, index) => {
+      const cell = headerRow.getCell(index + 1);
+      cell.value = value;
+      cell.font = { ...rawData.getRow(1).getCell(index + 1).font };
+      cell.fill = rawData.getRow(1).getCell(index + 1).fill;
+      cell.border = rawData.getRow(1).getCell(index + 1).border;
+      cell.alignment = rawData.getRow(1).getCell(index + 1).alignment;
+    });
+    headerRow.commit();
+
+    dynamicDataInputs.forEach((node, index) => {
+      const rowNumber = startRow + 1 + index;
+      copyRowStyle(rawData, 2, rowNumber);
+      const row = rawData.getRow(rowNumber);
+      row.getCell(1).value = node.id;
+      row.getCell(2).value = node.parentId ?? "";
+      row.getCell(3).value = node.title;
+      row.getCell(4).value = valueForWorkbook(node);
+      row.getCell(5).value = node.unit;
+      row.getCell(6).value = node.operator;
+      row.getCell(7).value = node.description;
+      row.getCell(8).value = node.source;
+      row.commit();
+      leafCellById.set(node.id, `'Raw Data'!$D$${rowNumber}`);
+    });
+  }
+
+  return leafCellById;
+}
+
+function populateVendorList(worksheet: ExcelJS.Worksheet, vendors: Vendor[]) {
+  const maxRowsToClear = Math.max(worksheet.rowCount, vendors.length + 1);
+  for (let rowNumber = 2; rowNumber <= maxRowsToClear; rowNumber += 1) {
+    for (let colNumber = 1; colNumber <= 7; colNumber += 1) {
+      worksheet.getRow(rowNumber).getCell(colNumber).value = null;
+    }
+  }
+
+  vendors.forEach((vendor, index) => {
+    const rowNumber = index + 2;
+    copyRowStyle(worksheet, 2, rowNumber);
+    const row = worksheet.getRow(rowNumber);
+    row.getCell(1).value = vendor.name;
+    row.getCell(2).value = vendor.ticker;
+    row.getCell(3).value = vendor.totalCompanyRevenue ?? vendor.revenue;
+    row.getCell(4).value = vendor.fiscalYear ?? 2025;
+    row.getCell(5).value = vendor.filingType;
+    row.getCell(6).value = vendor.secRetrievedAt ? new Date(vendor.secRetrievedAt) : null;
+    row.getCell(7).value = vendor.notes ?? vendor.rationale ?? vendor.confidenceRationale ?? "";
+    row.commit();
+  });
+}
+
+function populateSourcesAndNotes(worksheet: ExcelJS.Worksheet, nodes: ModelNode[], vendors: Vendor[]) {
+  const startRow = Math.max(worksheet.rowCount + 2, 16);
+  worksheet.getCell(`B${startRow}`).value = "Live Dashboard Sources";
+  copyRowStyle(worksheet, 11, startRow + 1);
+  worksheet.getCell(`B${startRow + 1}`).value = "Source";
+  worksheet.getCell(`C${startRow + 1}`).value = "Detail";
+
+  const sourceRows = [
+    ...nodes.map((node) => [node.title, `${node.source}${node.description ? ` — ${node.description}` : ""}`]),
+    ...vendors.map((vendor) => [vendor.name, vendor.filingUrl ?? vendor.filingSource ?? vendor.rationale ?? vendor.confidenceRationale ?? ""]),
+  ];
+
+  sourceRows.forEach(([source, detail], index) => {
+    const rowNumber = startRow + 2 + index;
+    copyRowStyle(worksheet, 12, rowNumber);
+    worksheet.getCell(`B${rowNumber}`).value = source;
+    worksheet.getCell(`C${rowNumber}`).value = detail;
+  });
+}
+
+function createFormulaForNode(nodeId: string, nodes: ModelNode[], leafCellById: Map<string, string>, stack: string[] = []): string {
+  const node = nodes.find((item) => item.id === nodeId);
+  if (!node) return "0";
+  if (stack.includes(nodeId)) return "0";
+  if (node.id === "tam-flow") return "'Output'!$C$5";
+  if (node.id === "sam-flow") return "'Output'!$C$6";
+
+  const children = nodes.filter((child) => child.parentId === node.id).sort((a, b) => a.order - b.order);
+  if (!children.length) return leafCellById.get(node.id) ?? `${valueForWorkbook(node)}`;
+
+  return children.reduce((formula, child, index) => {
+    const childFormula = `(${createFormulaForNode(child.id, nodes, leafCellById, [...stack, nodeId])})`;
+    if (index === 0 || child.operator === "=") return childFormula;
+    return `${formula}${excelOperator(child.operator)}${childFormula}`;
+  }, "");
+}
+
+function valueForWorkbook(node: ModelNode) {
+  return node.unit === "%" ? node.value / 100 : node.value;
+}
+
+function copyRowStyle(worksheet: ExcelJS.Worksheet, sourceRowNumber: number, targetRowNumber: number) {
+  const sourceRow = worksheet.getRow(sourceRowNumber);
+  const targetRow = worksheet.getRow(targetRowNumber);
+  targetRow.height = sourceRow.height;
+
+  sourceRow.eachCell({ includeEmpty: true }, (sourceCell, colNumber) => {
+    const targetCell = targetRow.getCell(colNumber);
+    targetCell.style = JSON.parse(JSON.stringify(sourceCell.style));
+    targetCell.numFmt = sourceCell.numFmt;
+  });
+}
+
+function excelOperator(operator: Operator) {
+  if (operator === "×") return "*";
+  if (operator === "÷") return "/";
+  if (operator === "−") return "-";
+  if (operator === "+") return "+";
+  return "";
 }
