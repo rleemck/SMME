@@ -1,11 +1,16 @@
+import {
+  cleanFilingParagraph,
+  excerptForEvidence,
+  extractFilingSections,
+  isLowQualityFilingText,
+} from "@/lib/filingTextParser";
 import type { SECRevenueSource, SecRetrievalStatus } from "@/types/sec";
 
 const SEC_BASE = "/api/sec";
 const SEC_WWW = "/api/sec-www";
 
-/** Preferred us-gaap tags for total company revenue (order matters). */
+/** us-gaap tags for total company revenue — contract-revenue first; generic Revenues last (often stale). */
 const REVENUE_XBRL_KEYS = [
-  "Revenues",
   "RevenueFromContractWithCustomerExcludingAssessedTax",
   "RevenueFromContractWithCustomerIncludingAssessedTax",
   "SalesRevenueNet",
@@ -13,7 +18,10 @@ const REVENUE_XBRL_KEYS = [
   "SalesRevenueServicesNet",
   "OperatingRevenue",
   "TotalRevenue",
+  "Revenues",
 ] as const;
+
+const QUARTERLY_FP = new Set(["Q1", "Q2", "Q3", "Q4"]);
 
 type XbrlFact = {
   val: number;
@@ -108,11 +116,25 @@ function stripHtml(html: string): string {
     .trim();
 }
 
-function extractBusinessExcerpt(text: string): string {
-  const cleaned = text.slice(0, 500_000);
-  const item1 = cleaned.match(/item\s*1[\.\s]*business/i);
-  const start = item1?.index ?? 0;
-  return cleaned.slice(start, start + 1200).trim();
+function buildFilingExcerpts(plainText: string): {
+  businessExcerpt: string;
+  mdaExcerpt: string;
+  segmentDisclosureExcerpt: string;
+  sourceExcerpt: string;
+} {
+  const sections = extractFilingSections(plainText);
+  const businessExcerpt =
+    cleanFilingParagraph(sections.business, 2200) ||
+    excerptForEvidence(sections.business, 2200);
+  const mdaExcerpt =
+    cleanFilingParagraph(sections.mda, 1600) || excerptForEvidence(sections.mda, 1600);
+  const segmentDisclosureExcerpt =
+    cleanFilingParagraph(sections.segment, 1200) || excerptForEvidence(sections.segment, 1200);
+  const sourceExcerpt =
+    businessExcerpt && !isLowQualityFilingText(businessExcerpt)
+      ? businessExcerpt.slice(0, 600) + (businessExcerpt.length > 600 ? "…" : "")
+      : excerptForEvidence(sections.business, 600);
+  return { businessExcerpt, mdaExcerpt, segmentDisclosureExcerpt, sourceExcerpt };
 }
 
 type CompanyFacts = {
@@ -130,72 +152,110 @@ type RevenuePick = {
   sourceLocation: string;
 };
 
-/** Pick latest annual fact; prefer 10-K FY rows when SEC provides fp. */
-function pickLatestAnnualFact(facts: XbrlFact[], formType: string): XbrlFact | null {
-  const annual = facts.filter((u) => u.form === formType || u.form === "10-K");
-  const pool = annual.length ? annual : facts;
-  const fyRows = pool.filter((u) => u.fp === "FY");
-  const ranked = [...(fyRows.length ? fyRows : pool)].sort((a, b) => b.end.localeCompare(a.end));
-  const seen = new Set<string>();
-  for (const row of ranked) {
-    if (seen.has(row.end)) continue;
-    seen.add(row.end);
-    if (row.val > 0) return row;
-  }
-  return null;
+function isContractRevenueTag(key: string): boolean {
+  return (
+    /^RevenueFromContractWithCustomer/i.test(key) &&
+    !/Liability|Remaining|Deferred|Recognized/i.test(key)
+  );
 }
 
-function pickFromGaapTag(gaap: Record<string, { units?: { USD?: XbrlFact[] } }>, key: string, formType: string) {
-  const usd = gaap[key]?.units?.USD;
-  if (!usd?.length) return null;
-  const latest = pickLatestAnnualFact(usd, formType);
-  if (!latest) return null;
-  const valueM = Math.round(latest.val / 1_000_000);
-  return { key, latest, valueM };
+function tagPriority(key: string): number {
+  const idx = REVENUE_XBRL_KEYS.indexOf(key as (typeof REVENUE_XBRL_KEYS)[number]);
+  if (idx >= 0) return idx;
+  if (isContractRevenueTag(key)) return REVENUE_XBRL_KEYS.length;
+  if (key === "Revenues") return 200;
+  return 100;
+}
+
+/** Latest FY annual fact: 10-K only unless filing is 10-Q fallback. Dedupe by end → max(val). */
+function pickLatestFyAnnualFact(usd: XbrlFact[], allowQuarterly: boolean): XbrlFact | null {
+  let pool = usd.filter((u) => u.val > 0 && u.form === "10-K");
+  if (!pool.length && allowQuarterly) {
+    pool = usd.filter((u) => u.val > 0 && u.form === "10-Q");
+  }
+  if (!pool.length) return null;
+
+  const fyRows = pool.filter((u) => u.fp === "FY");
+  const nonQuarterlyFp = pool.filter((u) => !u.fp || !QUARTERLY_FP.has(u.fp));
+  const work = fyRows.length ? fyRows : nonQuarterlyFp;
+  if (!work.length) return null;
+
+  const byEnd = new Map<string, XbrlFact>();
+  for (const row of work) {
+    const prev = byEnd.get(row.end);
+    if (!prev || row.val > prev.val) byEnd.set(row.end, row);
+  }
+
+  const latestEnd = [...byEnd.keys()].sort((a, b) => b.localeCompare(a))[0];
+  return latestEnd ? byEnd.get(latestEnd)! : null;
+}
+
+function discoverExtraRevenueTags(gaap: Record<string, { units?: { USD?: XbrlFact[] } }>): string[] {
+  return Object.keys(gaap).filter(
+    (k) =>
+      isContractRevenueTag(k) &&
+      !REVENUE_XBRL_KEYS.includes(k as (typeof REVENUE_XBRL_KEYS)[number]) &&
+      (gaap[k]?.units?.USD?.length ?? 0) > 0,
+  );
+}
+
+function pickBestRevenueFromGaap(
+  gaap: Record<string, { units?: { USD?: XbrlFact[] } }>,
+  filingFormType: string,
+): { key: string; latest: XbrlFact; valueM: number } | null {
+  const allowQuarterly = filingFormType === "10-Q";
+  const keys = [...REVENUE_XBRL_KEYS, ...discoverExtraRevenueTags(gaap)];
+
+  let best: { key: string; latest: XbrlFact; valueM: number } | null = null;
+
+  for (const key of keys) {
+    const usd = gaap[key]?.units?.USD;
+    if (!usd?.length) continue;
+    const latest = pickLatestFyAnnualFact(usd, allowQuarterly);
+    if (!latest) continue;
+
+    const candidate = { key, latest, valueM: Math.round(latest.val / 1_000_000) };
+    if (!best) {
+      best = candidate;
+      continue;
+    }
+
+    const endCmp = latest.end.localeCompare(best.latest.end);
+    if (endCmp > 0) {
+      best = candidate;
+      continue;
+    }
+    if (endCmp < 0) continue;
+
+    if (tagPriority(key) < tagPriority(best.key)) best = candidate;
+    else if (tagPriority(key) === tagPriority(best.key) && latest.val > best.latest.val) {
+      best = candidate;
+    }
+  }
+
+  return best;
 }
 
 async function extractTotalCompanyRevenue(
   cik: string,
-  formType: string,
+  filingFormType: string,
 ): Promise<RevenuePick | null> {
   const res = await secFetch(`${SEC_BASE}/api/xbrl/companyfacts/CIK${cik}.json`);
   const facts = (await res.json()) as CompanyFacts;
   const gaap = facts.facts?.["us-gaap"];
   if (!gaap) return null;
 
-  for (const key of REVENUE_XBRL_KEYS) {
-    const hit = pickFromGaapTag(gaap, key, formType);
-    if (!hit) continue;
-    return {
-      revenueMetric: hit.key,
-      totalCompanyRevenue: hit.valueM,
-      currency: "USD",
-      sourceExcerpt: `XBRL tag ${hit.key}: $${hit.valueM.toLocaleString()}M (period ending ${hit.latest.end}, form ${hit.latest.form}).`,
-      sourceLocation: `companyfacts/CIK${cik}.json · us-gaap:${hit.key}`,
-    };
-  }
+  const hit = pickBestRevenueFromGaap(gaap, filingFormType);
+  if (!hit) return null;
 
-  // Fallback: scan us-gaap for contract/total revenue tags many filers use
-  const fallbackKey = Object.keys(gaap).find(
-    (k) =>
-      /^RevenueFromContractWithCustomer/i.test(k) &&
-      !/Liability|Remaining|Deferred/i.test(k) &&
-      (gaap[k]?.units?.USD?.length ?? 0) > 0,
-  );
-  if (fallbackKey) {
-    const hit = pickFromGaapTag(gaap, fallbackKey, formType);
-    if (hit) {
-      return {
-        revenueMetric: hit.key,
-        totalCompanyRevenue: hit.valueM,
-        currency: "USD",
-        sourceExcerpt: `XBRL tag ${hit.key}: $${hit.valueM.toLocaleString()}M (period ending ${hit.latest.end}, form ${hit.latest.form}).`,
-        sourceLocation: `companyfacts/CIK${cik}.json · us-gaap:${hit.key}`,
-      };
-    }
-  }
-
-  return null;
+  const fpLabel = hit.latest.fp ? `, fp ${hit.latest.fp}` : "";
+  return {
+    revenueMetric: hit.key,
+    totalCompanyRevenue: hit.valueM,
+    currency: "USD",
+    sourceExcerpt: `XBRL tag ${hit.key}: $${hit.valueM.toLocaleString()}M (period ending ${hit.latest.end}, form ${hit.latest.form}${fpLabel}).`,
+    sourceLocation: `companyfacts/CIK${cik}.json · us-gaap:${hit.key}`,
+  };
 }
 
 export async function fetchSECRevenueSource(ticker: string): Promise<SECRevenueSource> {
@@ -234,13 +294,19 @@ export async function fetchSECRevenueSource(ticker: string): Promise<SECRevenueS
     const filingUrl = `https://www.sec.gov/Archives/edgar/data/${cikNum}/${accNoDash}/${filing.primaryDocument}`;
 
     let sourceExcerpt = "";
+    let businessExcerpt = "";
+    let mdaExcerpt = "";
+    let segmentDisclosureExcerpt = "";
     try {
       const docRes = await secFetch(
         `${SEC_WWW}/Archives/edgar/data/${cikNum}/${accNoDash}/${filing.primaryDocument}`,
         { headers: { Accept: "text/html,application/xhtml+xml" } },
       );
-      const excerpt = extractBusinessExcerpt(stripHtml(await docRes.text()));
-      sourceExcerpt = excerpt.slice(0, 600) + (excerpt.length > 600 ? "…" : "");
+      const excerpts = buildFilingExcerpts(stripHtml(await docRes.text()));
+      businessExcerpt = excerpts.businessExcerpt;
+      mdaExcerpt = excerpts.mdaExcerpt;
+      segmentDisclosureExcerpt = excerpts.segmentDisclosureExcerpt;
+      sourceExcerpt = excerpts.sourceExcerpt;
     } catch {
       /* optional narrative */
     }
@@ -271,6 +337,9 @@ export async function fetchSECRevenueSource(ticker: string): Promise<SECRevenueS
       totalCompanyRevenue: revenue?.totalCompanyRevenue ?? null,
       currency: revenue?.currency ?? "USD",
       sourceExcerpt: sourceExcerpt || "Filing retrieved; revenue XBRL not available for this period.",
+      businessExcerpt: businessExcerpt || undefined,
+      mdaExcerpt: mdaExcerpt || undefined,
+      segmentDisclosureExcerpt: segmentDisclosureExcerpt || undefined,
       sourceLocation: revenue?.sourceLocation ?? filingUrl,
       retrievalStatus,
       retrievedAt,

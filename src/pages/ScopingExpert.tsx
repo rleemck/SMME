@@ -9,6 +9,7 @@ import { VendorRecommendationTable } from "@/components/taxonomy/VendorRecommend
 import { SelectedSegmentChips } from "@/components/taxonomy/SelectedSegmentChips";
 import { segmentToSelection } from "@/lib/taxonomy/segments";
 import { useMockSec } from "@/services/secClient";
+import { PageShell } from "@/components/layout/PageShell";
 
 export default function ScopingExpert() {
   const {
@@ -35,7 +36,7 @@ export default function ScopingExpert() {
   };
 
   return (
-    <div className="p-8 animate-fade-in">
+    <PageShell>
       <div className="mb-4">
         <SecMockBanner />
       </div>
@@ -83,8 +84,8 @@ export default function ScopingExpert() {
         </div>
       )}
 
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-12 lg:col-span-4 space-y-5">
+      <div className="flex flex-col xl:flex-row gap-6 min-w-0">
+        <aside className="xl:w-[22rem] shrink-0 space-y-5">
           <Panel title="Selected taxonomy segments">
             <SelectedSegmentChips
               segments={selectedSegments}
@@ -115,12 +116,12 @@ export default function ScopingExpert() {
               structured confidence scoring.
             </p>
           </Panel>
-        </div>
-        <div className="col-span-12 lg:col-span-8">
+        </aside>
+        <div className="flex-1 min-w-0">
           <VendorRecommendationTable />
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

@@ -1,12 +1,10 @@
-import type {
-  EvidenceItem,
-  SelectedTaxonomySegment,
-  TaxonomySelection,
-  VendorMatch,
-} from "@/types/taxonomy";
+import type { SelectedTaxonomySegment, TaxonomySelection, VendorMatch } from "@/types/taxonomy";
 import type { SECRevenueSource } from "@/types/sec";
 import { computeConfidenceBreakdown } from "./confidenceScoring";
-import { buildEvidenceBackedRationale } from "./rationaleBuilder";
+import {
+  buildStructuredConfidenceRationale,
+  buildVendorEvidenceCards,
+} from "./evidenceBuilder";
 
 export type AiMatchRequest = {
   segments: SelectedTaxonomySegment[];
@@ -61,41 +59,6 @@ function pickSeed(segments: SelectedTaxonomySegment[]) {
   return SEGMENT_VENDOR_SEEDS.default;
 }
 
-function buildEvidenceItems(sec: SECRevenueSource | undefined, segments: SelectedTaxonomySegment[]): EvidenceItem[] {
-  const items: EvidenceItem[] = [];
-  const primary = segments.find((s) => s.isPrimary) ?? segments[0];
-
-  if (primary?.expandedDefinition || primary?.definition) {
-    items.push({
-      text: (primary.expandedDefinition ?? primary.definition)!.slice(0, 280),
-      section: "Taxonomy definition (primary)",
-    });
-  }
-
-  if (sec?.sourceExcerpt) {
-    items.push({
-      text: sec.sourceExcerpt.slice(0, 500) + (sec.sourceExcerpt.length > 500 ? "…" : ""),
-      section: `SEC ${sec.formType} · ${sec.revenueMetric}`,
-      filingUrl: sec.filingUrl,
-      formType: sec.formType,
-      fiscalYear: sec.fiscalYear,
-      filingDate: sec.filingDate,
-    });
-  }
-
-  if (sec?.totalCompanyRevenue != null) {
-    items.push({
-      text: `Total company revenue: $${sec.totalCompanyRevenue.toLocaleString()}M (${sec.revenueMetric}, ${sec.formType})`,
-      section: "XBRL total revenue",
-      filingUrl: sec.filingUrl,
-      formType: sec.formType,
-      filingDate: sec.filingDate,
-    });
-  }
-
-  return items;
-}
-
 export const structuredAiGateway: AiGateway = {
   async matchVendors(req) {
     const primary = req.segments.find((s) => s.isPrimary) ?? req.segments[0];
@@ -116,9 +79,18 @@ export const structuredAiGateway: AiGateway = {
         sec,
       );
       const confidence = breakdown.finalConfidence;
+      const companyName = co?.name ?? sec?.companyName ?? s.name;
+      const evidenceCards = buildVendorEvidenceCards(companyName, sec, req.segments, co?.description, {
+        forScoping: true,
+      });
+      const confidenceRationaleDetailed = buildStructuredConfidenceRationale(
+        confidence,
+        breakdown,
+        evidenceCards,
+        req.segments,
+        { companyName, forScoping: true },
+      );
       const totalRev = sec?.totalCompanyRevenue ?? null;
-      const evidenceItems = buildEvidenceItems(sec, req.segments);
-      const rationale = buildEvidenceBackedRationale(confidence, breakdown, sec, req.segments);
 
       const hasSecFiling =
         sec?.retrievalStatus === "live" || sec?.retrievalStatus === "fallback_10q";
@@ -130,16 +102,18 @@ export const structuredAiGateway: AiGateway = {
             : Math.round(800 * s.share);
 
       return {
-        companyName: co?.name ?? sec?.companyName ?? s.name,
+        companyName,
         ticker: s.ticker,
         exchange: co?.exchange,
         confidence,
         confidenceBreakdown: breakdown,
         matchedSegment: primary.name,
         taxonomyPath: primary.path,
-        rationale,
-        supportingEvidence: evidenceItems.map((e) => e.text).filter(Boolean),
-        evidenceItems,
+        rationale: confidenceRationaleDetailed,
+        supportingEvidence: evidenceCards.map((c) => c.excerpt).filter(Boolean),
+        evidenceItems: [],
+        evidenceCards,
+        confidenceRationaleDetailed,
         secRevenue: sec,
         estimatedSegmentRevenue: segmentRev,
         estimatedSegmentShare: s.share,

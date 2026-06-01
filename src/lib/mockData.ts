@@ -1,3 +1,4 @@
+import type { EvidenceCard } from "@/types/evidence";
 import type { ConfidenceBreakdown, EvidenceItem, MappingStatus } from "@/types/taxonomy";
 import type { SECRevenueSource, SecRetrievalStatus } from "@/types/sec";
 
@@ -19,6 +20,8 @@ export type Vendor = {
   confidenceBreakdown?: ConfidenceBreakdown;
   supportingEvidence?: string[];
   evidenceItems?: EvidenceItem[];
+  evidenceCards?: EvidenceCard[];
+  confidenceRationaleDetailed?: string;
   secRevenue?: SECRevenueSource;
   secDataStatus?: SecRetrievalStatus;
   secRetrievedAt?: string;

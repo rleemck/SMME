@@ -1,4 +1,5 @@
 import { LayoutTemplate, Shield, Cloud, Heart, DollarSign, ShoppingCart, Cpu } from "lucide-react";
+import { PageShell } from "@/components/layout/PageShell";
 
 const TEMPLATES = [
   { name: "Cloud Security TAM", icon: Shield, desc: "Endpoint, IAM, Cloud, Network", vendors: 24, tam: "$78B" },
@@ -11,7 +12,7 @@ const TEMPLATES = [
 
 export default function Templates() {
   return (
-    <div className="p-8 animate-fade-in">
+    <PageShell>
       <div className="mds-eyebrow mb-1">Library</div>
       <h1 className="text-2xl font-semibold text-mds-navy mb-6">Templates</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -32,6 +33,6 @@ export default function Templates() {
           </div>
         ))}
       </div>
-    </div>
+    </PageShell>
   );
 }

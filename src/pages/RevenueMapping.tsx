@@ -9,8 +9,11 @@ import { TrendingUp, ChevronRight, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { MappingStatus } from "@/types/taxonomy";
 import { TextExpandable } from "@/components/taxonomy/TextExpandable";
+import { getFilingNarrativeExcerpt } from "@/lib/filingNarrative";
+import { keywordsForSegments } from "@/services/evidenceBuilder";
 import { SecStatusBadge } from "@/components/sec/SecStatusBadge";
 import { SecMockBanner } from "@/components/sec/SecMockBanner";
+import { PageShell } from "@/components/layout/PageShell";
 
 export default function RevenueMapping() {
   const {
@@ -19,8 +22,10 @@ export default function RevenueMapping() {
     tam,
     baseRevenue,
     primarySegment,
+    selectedSegments,
     vendorUniverseSummary,
   } = useModel();
+  const filingKeywords = keywordsForSegments(selectedSegments);
   const navigate = useNavigate();
   const included = includedVendors;
 
@@ -31,7 +36,7 @@ export default function RevenueMapping() {
   };
 
   return (
-    <div className="p-8 animate-fade-in">
+    <PageShell>
       <div className="mb-4">
         <SecMockBanner />
       </div>
@@ -39,7 +44,7 @@ export default function RevenueMapping() {
         <div>
           <div className="mds-eyebrow mb-1">Step 2 · Revenue mapping</div>
           <h1 className="text-2xl font-semibold text-mds-navy">Segment revenue attribution</h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+          <p className="text-sm text-muted-foreground mt-1 max-w-3xl leading-relaxed">
             {REVENUE_HELPER_TEXT} Showing {included.length} included vendor(s)
             {vendorUniverseSummary.excluded > 0
               ? ` (${vendorUniverseSummary.excluded} excluded at scoping).`
@@ -71,8 +76,8 @@ export default function RevenueMapping() {
         />
       </div>
 
-      <div className="rounded-lg border bg-card shadow-sm overflow-x-auto">
-        <Table>
+      <div className="desktop-table-panel desktop-table-scroll scrollbar-visible">
+        <Table className="desktop-data-table desktop-data-table-wide">
           <TableHeader>
             <TableRow>
               <TableHead>Vendor</TableHead>
@@ -82,14 +87,13 @@ export default function RevenueMapping() {
               <TableHead>Filing</TableHead>
               <TableHead>Filing date</TableHead>
               <TableHead>SEC link</TableHead>
-              <TableHead>XBRL tag</TableHead>
-              <TableHead className="min-w-[160px]">Source excerpt</TableHead>
+              <TableHead className="cell-prose-wide">10-K excerpt (Item 1)</TableHead>
               <TableHead className="text-right">Est. share</TableHead>
               <TableHead className="text-right">Segment rev ($M)</TableHead>
               <TableHead>SEC status</TableHead>
-              <TableHead className="min-w-[180px]">Confidence rationale</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Notes</TableHead>
+              <TableHead className="cell-prose">Confidence rationale</TableHead>
+              <TableHead className="cell-compact">Status</TableHead>
+              <TableHead className="min-w-[10rem]">Notes</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -127,11 +131,14 @@ export default function RevenueMapping() {
                     "—"
                   )}
                 </TableCell>
-                <TableCell className="text-[10px] font-mono max-w-[100px] truncate" title={v.revenueMetric}>
-                  {v.revenueMetric ?? "—"}
-                </TableCell>
-                <TableCell className="max-w-[180px]">
-                  <TextExpandable text={v.secRevenue?.sourceExcerpt ?? ""} maxChars={200} />
+                <TableCell className="cell-prose-wide">
+                  <TextExpandable
+                    text={
+                      getFilingNarrativeExcerpt(v.secRevenue, filingKeywords, 360) ||
+                      "—"
+                    }
+                    maxChars={480}
+                  />
                 </TableCell>
                 <TableCell className="text-right">
                   <Input
@@ -155,8 +162,11 @@ export default function RevenueMapping() {
                 <TableCell>
                   <SecStatusBadge status={v.secDataStatus} retrievedAt={v.secRetrievedAt} compact />
                 </TableCell>
-                <TableCell className="max-w-[200px]">
-                  <TextExpandable text={v.confidenceRationale ?? v.rationale ?? ""} />
+                <TableCell className="cell-prose">
+                  <TextExpandable
+                    text={v.confidenceRationale ?? v.rationale ?? ""}
+                    maxChars={400}
+                  />
                 </TableCell>
                 <TableCell>
                   <Select
@@ -178,10 +188,10 @@ export default function RevenueMapping() {
                     </SelectContent>
                   </Select>
                 </TableCell>
-                <TableCell className="min-w-[120px]">
+                <TableCell>
                   <Textarea
-                    rows={1}
-                    className="min-h-8 text-xs"
+                    rows={2}
+                    className="min-h-[3.5rem] text-sm w-full min-w-[10rem] resize-y"
                     value={v.notes ?? ""}
                     onChange={(e) => updateVendor(v.id, { notes: e.target.value })}
                   />
@@ -196,7 +206,7 @@ export default function RevenueMapping() {
           </p>
         )}
       </div>
-    </div>
+    </PageShell>
   );
 }
 

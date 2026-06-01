@@ -25,7 +25,7 @@ export function TaxonomySelector() {
         <span className="flex items-center gap-2 text-left">
           <Layers className="h-4 w-4 shrink-0 text-mds-blue" />
           {primary ? (
-            <span className="truncate">
+            <span className="break-words">
               {primary.path.join(" › ")}
               {selectedSegments.length > 1 ? ` (+${selectedSegments.length - 1} more)` : ""}
             </span>

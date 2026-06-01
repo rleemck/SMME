@@ -1,5 +1,6 @@
 import { Switch } from "@/components/ui/switch";
 import { CheckCircle2, Circle } from "lucide-react";
+import { PageShell } from "@/components/layout/PageShell";
 
 const INTEGRATIONS = [
   { name: "OpenAI API", desc: "LLM reasoning & summary generation", connected: false },
@@ -12,7 +13,7 @@ const INTEGRATIONS = [
 
 export default function Settings() {
   return (
-    <div className="p-8 max-w-4xl animate-fade-in">
+    <PageShell narrow>
       <div className="mds-eyebrow mb-1">Workspace</div>
       <h1 className="text-2xl font-semibold text-mds-navy mb-6">Settings</h1>
 
@@ -47,6 +48,6 @@ export default function Settings() {
           ))}
         </div>
       </section>
-    </div>
+    </PageShell>
   );
 }

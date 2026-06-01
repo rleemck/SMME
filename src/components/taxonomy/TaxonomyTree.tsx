@@ -93,7 +93,7 @@ function TreeNode({
           >
             {node.level}
           </Badge>
-          <span className="truncate font-medium">{node.name}</span>
+          <span className="font-medium break-words min-w-0">{node.name}</span>
         </button>
       </div>
       {hasChildren && isOpen && (

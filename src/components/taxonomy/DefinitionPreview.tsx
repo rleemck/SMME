@@ -37,8 +37,8 @@ export function DefinitionPreview({ segment, compact }: Props) {
             Expanded definition
           </div>
           <p
-            className={`text-sm text-muted-foreground leading-relaxed ${
-              compact ? "line-clamp-6" : "max-h-48 overflow-y-auto"
+            className={`text-sm text-muted-foreground leading-relaxed break-words whitespace-pre-wrap ${
+              compact ? "line-clamp-6" : ""
             }`}
           >
             {segment.expandedDefinition}

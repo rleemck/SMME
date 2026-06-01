@@ -1,5 +1,7 @@
 import type { ConfidenceBreakdown, SelectedTaxonomySegment } from "@/types/taxonomy";
 import type { SECRevenueSource } from "@/types/sec";
+import { collectFilingNarrativeText } from "@/lib/filingNarrative";
+import { extractTaxonomyConcepts, matchTaxonomyConcepts } from "./evidenceBuilder";
 
 const WEIGHTS = {
   taxonomyTermMatch: 0.2,
@@ -34,8 +36,11 @@ function segmentWeight(seg: SelectedTaxonomySegment, primary: SelectedTaxonomySe
   return seg.isPrimary || seg.id === primary.id ? 1 : 0.45;
 }
 
-/** Combined taxonomy text for product-description overlap; primary segment is emphasized. */
-function buildCombinedDefinition(segments: SelectedTaxonomySegment[]): string {
+/**
+ * Combined taxonomy text for product-description overlap; primary segment is emphasized.
+ * Do not use `.repeat(n).padEnd(0)` — padEnd(0) truncates to "" and breaks adjacent segments.
+ */
+export function buildCombinedDefinition(segments: SelectedTaxonomySegment[]): string {
   return segments
     .map((s) => {
       const text = `${s.name} ${s.expandedDefinition ?? s.definition ?? ""}`.trim();
@@ -69,7 +74,7 @@ export function computeConfidenceBreakdown(
 
   const combinedDef = buildCombinedDefinition(segments);
 
-  const filingText = sec?.sourceExcerpt ?? "";
+  const filingText = collectFilingNarrativeText(sec);
 
   const productText = [companyDescription ?? "", companyName, filingText].join(" ");
 
@@ -77,9 +82,10 @@ export function computeConfidenceBreakdown(
   let expandedDefinitionMatch = 0;
   for (const seg of segments) {
     const w = segmentWeight(seg, primary);
+    const segText = `${seg.name} ${seg.expandedDefinition ?? seg.definition ?? ""}`.trim();
     taxonomyTermMatch = Math.max(
       taxonomyTermMatch,
-      overlapScore(seg.name + " " + (seg.definition ?? ""), productText) * w,
+      overlapScore(segText, productText) * w,
     );
     expandedDefinitionMatch = Math.max(
       expandedDefinitionMatch,
@@ -90,6 +96,13 @@ export function computeConfidenceBreakdown(
   expandedDefinitionMatch = Math.min(1, expandedDefinitionMatch);
 
   const productDescriptionMatch = Math.min(1, overlapScore(combinedDef, productText));
+
+  const concepts = extractTaxonomyConcepts(segments);
+  const conceptMatches = matchTaxonomyConcepts(concepts, filingText || productText);
+  const matchedCount = conceptMatches.filter((m) => m.matched).length;
+  const taxonomyConceptMatch =
+    concepts.length > 0 ? Math.min(1, matchedCount / Math.max(2, concepts.length * 0.5)) : 0;
+
   const segmentRevenueEvidence =
     sec?.totalCompanyRevenue != null && sec.totalCompanyRevenue > 0
       ? Math.min(1, 0.55 + (sec.revenueMetric !== "—" ? 0.25 : 0))
@@ -120,7 +133,11 @@ export function computeConfidenceBreakdown(
     segmentRevenueEvidence * WEIGHTS.segmentRevenueEvidence +
     filingEvidenceQuality * WEIGHTS.filingEvidenceQuality;
 
-  const finalConfidence = Math.min(0.98, Math.max(0.55, weighted - negativeSignals));
+  const filingBoost = filingText ? taxonomyConceptMatch * 0.28 : 0;
+  const noFilingPenalty = !filingText && (!sec || sec.retrievalStatus === "unavailable") ? 0.22 : 0;
+  const raw =
+    weighted * 0.62 + taxonomyConceptMatch * 0.28 + filingBoost - negativeSignals - noFilingPenalty;
+  const finalConfidence = Math.min(0.97, Math.max(0.32, raw));
 
   const pct = Math.round(finalConfidence * 100);
   const rationale =

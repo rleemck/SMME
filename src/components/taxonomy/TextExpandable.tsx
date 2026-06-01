@@ -11,14 +11,14 @@ export function TextExpandable({ text, maxChars = 280 }: Props) {
   const needsMore = text.length > maxChars;
 
   return (
-    <div>
-      <p className="text-[11px] text-muted-foreground whitespace-pre-wrap break-words leading-snug">
+    <div className="min-w-0 w-full">
+      <p className="text-xs sm:text-sm text-muted-foreground whitespace-pre-wrap break-words leading-relaxed">
         {expanded || !needsMore ? text : `${text.slice(0, maxChars)}…`}
       </p>
       {needsMore && (
         <button
           type="button"
-          className="text-[11px] font-medium text-mds-blue hover:underline mt-1"
+          className="text-xs sm:text-sm font-medium text-mds-blue hover:underline mt-1.5"
           onClick={() => setExpanded((e) => !e)}
         >
           {expanded ? "Show less" : "Show more"}

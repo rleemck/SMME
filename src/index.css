@@ -86,4 +86,81 @@
     background-image: radial-gradient(circle, rgb(148 163 184 / 0.35) 1px, transparent 1px);
     background-size: 20px 20px;
   }
+
+  /* Desktop-first page & data tables */
+  .page-shell {
+    @apply w-full min-w-0 px-6 py-6 xl:px-8 xl:py-8;
+  }
+
+  .desktop-table-panel {
+    @apply rounded-lg border bg-card shadow-sm w-full min-w-0;
+  }
+
+  .desktop-table-scroll {
+    @apply w-full min-w-0 overflow-x-auto;
+  }
+
+  .desktop-data-table {
+    @apply w-full text-sm;
+    min-width: 72rem;
+  }
+
+  .desktop-data-table-wide {
+    min-width: 88rem;
+  }
+
+  .desktop-data-table th,
+  .desktop-data-table td {
+    @apply align-top whitespace-normal break-words;
+  }
+
+  .desktop-data-table th {
+    @apply text-xs font-semibold text-muted-foreground;
+  }
+
+  .cell-compact {
+    @apply whitespace-nowrap;
+  }
+
+  .cell-prose {
+    @apply min-w-[16rem] max-w-[28rem] text-xs leading-relaxed sm:text-sm sm:leading-relaxed;
+  }
+
+  .cell-prose-wide {
+    @apply min-w-[20rem] max-w-[36rem] text-xs leading-relaxed sm:text-sm sm:leading-relaxed;
+  }
+
+  /* Visible scrollbars for wide tables and summary panels (desktop) */
+  .scrollbar-visible {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.45) hsl(var(--surface-muted));
+  }
+
+  .scrollbar-visible::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .scrollbar-visible::-webkit-scrollbar-track {
+    background: hsl(var(--surface-muted));
+    border-radius: 4px;
+  }
+
+  .scrollbar-visible::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.4);
+    border-radius: 4px;
+  }
+
+  .scrollbar-visible::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.55);
+  }
+
+  .scroll-region-y {
+    @apply overflow-y-auto overflow-x-auto scrollbar-visible;
+    max-height: min(70vh, 32rem);
+  }
+
+  .scroll-region-x {
+    @apply overflow-x-auto overflow-y-hidden scrollbar-visible;
+  }
 }

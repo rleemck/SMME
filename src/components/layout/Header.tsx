@@ -6,9 +6,9 @@ export default function Header() {
   const { market, setCopilotOpen, copilotOpen } = useModel();
   return (
     <header className="h-14 shrink-0 border-b bg-card flex items-center px-6 gap-4">
-      <div className="flex items-baseline gap-3 min-w-0">
-        <div className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Market</div>
-        <div className="text-sm font-semibold text-mds-navy truncate">{market.name}</div>
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 min-w-0 flex-1">
+        <div className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground shrink-0">Market</div>
+        <div className="text-sm font-semibold text-mds-navy break-words">{market.name}</div>
         <span className="text-muted-foreground">·</span>
         <div className="text-sm text-muted-foreground">{market.dataSource}</div>
         <span className="text-muted-foreground">·</span>

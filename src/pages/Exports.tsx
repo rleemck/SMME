@@ -4,6 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useModel, fmtUsdB } from "@/store/ModelStore";
 import { exportModelWorkbook } from "@/services/excelExportService";
 import { FileSpreadsheet, Download, FileText } from "lucide-react";
+import { PageShell } from "@/components/layout/PageShell";
 
 const OUTPUTS = [
   { id: "exec", label: "Executive Summary", desc: "1-page TAM + key drivers" },
@@ -20,7 +21,7 @@ export default function Exports() {
   const [format, setFormat] = useState<"xlsx" | "csv">("xlsx");
 
   return (
-    <div className="p-8 animate-fade-in">
+    <PageShell>
       <div className="mds-eyebrow mb-1">Export Center</div>
       <h1 className="text-2xl font-semibold text-mds-navy mb-6">Export market model</h1>
 
@@ -114,7 +115,7 @@ export default function Exports() {
           </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

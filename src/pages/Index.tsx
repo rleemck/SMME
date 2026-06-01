@@ -9,6 +9,7 @@ import { TaxonomySelector } from "@/components/taxonomy/TaxonomySelector";
 import { SecMockBanner } from "@/components/sec/SecMockBanner";
 import { ArrowRight, FileText, Layers, Calculator, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { PageShell } from "@/components/layout/PageShell";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ export default function Index() {
   };
 
   return (
-    <div className="p-8 max-w-5xl mx-auto animate-fade-in">
+    <PageShell narrow>
       <div className="mb-6">
         <SecMockBanner />
       </div>
@@ -116,7 +117,7 @@ export default function Index() {
         <KpiCard icon={Layers} label="Public companies" value="5,300+" />
         <KpiCard icon={Calculator} label="Data source" value="SEC EDGAR" />
       </div>
-    </div>
+    </PageShell>
   );
 }
 

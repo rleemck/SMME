@@ -9,7 +9,9 @@
     "preview": "node ./node_modules/vite/bin/vite.js preview",
     "lint": "eslint .",
     "test": "vitest run",
-    "build:taxonomy": "node scripts/convert-taxonomy.mjs"
+    "build:taxonomy": "node scripts/convert-taxonomy.mjs",
+    "verify:sec": "node scripts/verify-sec.mjs",
+    "verify:sec-revenue": "node scripts/verify-sec-revenue.mjs"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.2",

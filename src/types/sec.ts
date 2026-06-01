@@ -19,6 +19,12 @@ export type SECRevenueSource = {
   totalCompanyRevenue: number | null;
   currency?: string;
   sourceExcerpt: string;
+  /** Item 1 Business — product/business narrative (no TOC) */
+  businessExcerpt?: string;
+  /** Item 7 MD&A — management discussion excerpts */
+  mdaExcerpt?: string;
+  /** Segment / reportable segment disclosure */
+  segmentDisclosureExcerpt?: string;
   sourceLocation?: string;
   retrievalStatus: SecRetrievalStatus;
   retrievedAt: string;

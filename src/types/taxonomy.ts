@@ -114,6 +114,8 @@ export type VendorMatch = {
   rationale: string;
   supportingEvidence: string[];
   evidenceItems: EvidenceItem[];
+  evidenceCards: import("./evidence").EvidenceCard[];
+  confidenceRationaleDetailed?: string;
   secFiling?: SECFilingSource;
   secRevenue?: import("@/types/sec").SECRevenueSource;
   estimatedSegmentRevenue?: number;

@@ -31,8 +31,8 @@ export function SelectedSegmentChips({ segments, onRemove, onSetPrimary }: Props
               Set primary
             </button>
           )}
-          <span className="truncate max-w-[200px]" title={seg.path.join(" › ")}>
-            <Badge variant="outline" className="text-[9px] mr-1 py-0">
+          <span className="break-words" title={seg.path.join(" › ")}>
+            <Badge variant="outline" className="text-[10px] mr-1 py-0 shrink-0">
               {seg.level}
             </Badge>
             {seg.name}

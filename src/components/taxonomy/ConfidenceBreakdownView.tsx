@@ -16,9 +16,10 @@ type Props = {
   confidence: number;
   breakdown?: ConfidenceBreakdown;
   needsReview?: boolean;
+  segmentName?: string;
 };
 
-export function ConfidenceBreakdownView({ confidence, breakdown, needsReview }: Props) {
+export function ConfidenceBreakdownView({ confidence, breakdown, needsReview, segmentName }: Props) {
   const [open, setOpen] = useState(false);
   const pct = Math.round(confidence * 100);
 
@@ -42,13 +43,13 @@ export function ConfidenceBreakdownView({ confidence, breakdown, needsReview }: 
           </button>
         )}
       </div>
-      {breakdown && (
-        <p className="text-[10px] text-muted-foreground text-left max-w-[220px] ml-auto leading-snug">
-          {breakdown.rationale}
+      {segmentName && (
+        <p className="text-xs text-muted-foreground text-right ml-auto leading-snug break-words">
+          vs {segmentName}
         </p>
       )}
       {open && breakdown && (
-        <div className="mt-2 rounded border bg-surface-muted p-2 text-left text-[10px] space-y-1">
+        <div className="mt-2 rounded border bg-surface-muted p-2.5 text-left text-xs space-y-1 min-w-[14rem] max-w-[20rem]">
           <div className="font-semibold text-mds-navy flex items-center justify-between">
             Scoring breakdown
             <button type="button" onClick={() => setOpen(false)} aria-label="Close">

@@ -45,7 +45,7 @@ export function TaxonomySearch({ onPick }: Props) {
                   </Badge>
                   <span className="font-medium">{n.name}</span>
                 </div>
-                <div className="text-xs text-muted-foreground mt-0.5 truncate">{n.path.join(" › ")}</div>
+                <div className="text-xs text-muted-foreground mt-0.5 break-words">{n.path.join(" › ")}</div>
               </button>
             </li>
           ))}

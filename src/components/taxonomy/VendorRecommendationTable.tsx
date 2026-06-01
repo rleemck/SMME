@@ -6,36 +6,62 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import type { Vendor } from "@/lib/mockData";
 import { useModel } from "@/store/ModelStore";
+import type { EvidenceCard } from "@/types/evidence";
+import { buildStructuredConfidenceRationale, buildVendorEvidenceCards } from "@/services/evidenceBuilder";
+import { computeConfidenceBreakdown } from "@/services/confidenceScoring";
 import { isVendorIncluded } from "@/lib/vendorSelection";
-import { EvidenceExpandable } from "./EvidenceExpandable";
+import { EvidenceCardsExpandable } from "./EvidenceCardsExpandable";
 import { ConfidenceBreakdownView } from "./ConfidenceBreakdownView";
-import { TextExpandable } from "./TextExpandable";
+import { ConfidenceRationaleExpandable } from "./ConfidenceRationaleExpandable";
 import { VendorBulkControls } from "./VendorBulkControls";
 import { SecStatusBadge } from "@/components/sec/SecStatusBadge";
-import type { EvidenceItem } from "@/types/taxonomy";
 import { ExternalLink } from "lucide-react";
 import { fmtUsdM } from "@/store/ModelStore";
 
-function vendorEvidence(v: Vendor): EvidenceItem[] {
-  if (v.evidenceItems?.length) return v.evidenceItems;
-  const sec = v.secRevenue;
-  if (sec?.sourceExcerpt) {
-    return [
-      {
-        text: sec.sourceExcerpt,
-        section: `SEC ${sec.formType}`,
-        filingUrl: sec.filingUrl,
-        formType: sec.formType,
-        fiscalYear: sec.fiscalYear,
-        filingDate: sec.filingDate,
-      },
-    ];
-  }
-  return (v.supportingEvidence ?? []).map((text) => ({ text }));
-}
-
 export function VendorRecommendationTable() {
-  const { vendors, setVendorIncluded, includeSelectedVendors, excludeSelectedVendors } = useModel();
+  const { vendors, selectedSegments, setVendorIncluded, includeSelectedVendors, excludeSelectedVendors } =
+    useModel();
+
+  const filterScopingCards = (list: EvidenceCard[]) =>
+    list.filter(
+      (c) =>
+        c.sourceType !== "TAXONOMY_MATCH" &&
+        !(c.sourceType === "SEC_SEGMENT_DISCLOSURE" && /XBRL|total company revenue/i.test(c.excerpt)),
+    );
+
+  const resolveEvidenceCards = (v: Vendor): EvidenceCard[] => {
+    const stored = filterScopingCards(v.evidenceCards ?? []);
+    if (stored.length) return stored;
+    if (!selectedSegments.length || !v.secRevenue) return [];
+    return filterScopingCards(
+      buildVendorEvidenceCards(v.name, v.secRevenue, selectedSegments, undefined, { forScoping: true }),
+    );
+  };
+
+  const resolveConfidence = (v: Vendor, cards: EvidenceCard[]) => {
+    if (!selectedSegments.length) {
+      return {
+        confidence: v.confidence,
+        breakdown: v.confidenceBreakdown,
+        rationale: v.confidenceRationaleDetailed ?? v.confidenceRationale ?? v.rationale ?? "",
+      };
+    }
+    const breakdown = computeConfidenceBreakdown(
+      selectedSegments,
+      v.name,
+      undefined,
+      v.secRevenue,
+    );
+    const confidence = breakdown.finalConfidence;
+    const rationale = buildStructuredConfidenceRationale(
+      confidence,
+      breakdown,
+      cards,
+      selectedSegments,
+      { companyName: v.name, forScoping: true },
+    );
+    return { confidence, breakdown, rationale };
+  };
   const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
 
   const allRowIds = useMemo(() => vendors.map((v) => v.id), [vendors]);
@@ -45,7 +71,7 @@ export function VendorRecommendationTable() {
   const selectedIds = Array.from(selectedRowIds);
 
   return (
-    <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+    <div className="desktop-table-panel">
       <VendorBulkControls />
 
       {selectedRowIds.size > 0 && (
@@ -63,28 +89,28 @@ export function VendorRecommendationTable() {
         </div>
       )}
 
-      <div className="overflow-x-auto">
-        <Table>
+      <div className="desktop-table-scroll scrollbar-visible">
+        <Table className="desktop-data-table">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-10">
+              <TableHead className="w-10 cell-compact">
                 <Checkbox
                   checked={allSelected ? true : someSelected ? "indeterminate" : false}
                   onCheckedChange={(c) => toggleSelectAll(c === true)}
                   aria-label="Select all"
                 />
               </TableHead>
-              <TableHead>Include</TableHead>
-              <TableHead>Company</TableHead>
-              <TableHead>Ticker</TableHead>
-              <TableHead className="text-right">Confidence</TableHead>
-              <TableHead className="min-w-[200px]">Confidence rationale</TableHead>
-              <TableHead className="min-w-[180px]">Evidence</TableHead>
-              <TableHead>SEC status</TableHead>
-              <TableHead className="text-right">Total co. rev</TableHead>
-              <TableHead>FY</TableHead>
-              <TableHead>Revenue tag</TableHead>
-              <TableHead>SEC filing</TableHead>
+              <TableHead className="cell-compact">Include</TableHead>
+              <TableHead className="min-w-[8rem]">Company</TableHead>
+              <TableHead className="cell-compact">Ticker</TableHead>
+              <TableHead className="text-right cell-compact min-w-[5.5rem]">Confidence</TableHead>
+              <TableHead className="cell-prose">Confidence rationale</TableHead>
+              <TableHead className="cell-prose-wide">Evidence</TableHead>
+              <TableHead className="min-w-[6rem]">SEC status</TableHead>
+              <TableHead className="text-right cell-compact">Total co. rev</TableHead>
+              <TableHead className="cell-compact">FY</TableHead>
+              <TableHead className="min-w-[9rem]">Revenue tag</TableHead>
+              <TableHead className="cell-compact">SEC filing</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -93,6 +119,8 @@ export function VendorRecommendationTable() {
               const total =
                 v.totalCompanyRevenue ??
                 (v.revenue > 0 ? v.revenue : null);
+              const cards = resolveEvidenceCards(v);
+              const { confidence, breakdown, rationale } = resolveConfidence(v, cards);
               return (
                 <TableRow
                   key={v.id}
@@ -114,7 +142,7 @@ export function VendorRecommendationTable() {
                   <TableCell>
                     <div className="flex flex-col gap-1 items-start">
                       <Switch checked={included} onCheckedChange={(c) => setVendorIncluded(v.id, c)} />
-                      <Badge variant={included ? "default" : "outline"} className="text-[9px]">
+                      <Badge variant={included ? "default" : "outline"} className="text-[10px]">
                         {included ? "Included" : "Excluded"}
                       </Badge>
                     </div>
@@ -128,25 +156,32 @@ export function VendorRecommendationTable() {
                   <TableCell className="font-mono text-xs">{v.ticker}</TableCell>
                   <TableCell>
                     <ConfidenceBreakdownView
-                      confidence={v.confidence}
-                      breakdown={v.confidenceBreakdown}
-                      needsReview={v.needsReview}
+                      confidence={confidence}
+                      breakdown={breakdown}
+                      needsReview={confidence < 0.8 || v.secDataStatus === "unavailable"}
+                      segmentName={v.matchedSegment}
                     />
                   </TableCell>
-                  <TableCell className="max-w-[220px]">
-                    <TextExpandable text={v.confidenceRationale ?? v.rationale ?? ""} />
+                  <TableCell className="cell-prose">
+                    <ConfidenceRationaleExpandable rationale={rationale} confidence={confidence} />
                   </TableCell>
-                  <TableCell className="max-w-[200px]">
-                    <EvidenceExpandable evidence={vendorEvidence(v)} maxVisible={2} />
+                  <TableCell className="cell-prose-wide">
+                    <EvidenceCardsExpandable
+                      cards={cards}
+                      companyName={v.name}
+                      segmentName={v.matchedSegment}
+                      secStatus={v.secDataStatus}
+                      maxVisible={2}
+                    />
                   </TableCell>
                   <TableCell>
                     <SecStatusBadge status={v.secDataStatus} retrievedAt={v.secRetrievedAt} />
                   </TableCell>
-                  <TableCell className="text-right text-sm tabular-nums whitespace-nowrap">
+                  <TableCell className="text-right text-sm tabular-nums cell-compact">
                     {total != null ? fmtUsdM(total) : "—"}
                   </TableCell>
                   <TableCell className="text-xs">{v.fiscalYear ?? v.secRevenue?.fiscalYear ?? "—"}</TableCell>
-                  <TableCell className="text-[10px] font-mono max-w-[120px] truncate" title={v.revenueMetric}>
+                  <TableCell className="text-xs font-mono break-all leading-snug">
                     {v.revenueMetric ?? "—"}
                   </TableCell>
                   <TableCell>
