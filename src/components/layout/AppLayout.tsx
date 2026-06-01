@@ -10,7 +10,7 @@ export default function AppLayout() {
       <div className="flex-1 flex flex-col min-w-0">
         <Header />
         <div className="flex-1 flex min-h-0">
-          <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
+          <main className="flex-1 min-w-0 overflow-y-auto overflow-x-auto">
             <Outlet />
           </main>
           <AICopilot />

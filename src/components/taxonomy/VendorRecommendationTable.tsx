@@ -7,12 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import type { Vendor } from "@/lib/mockData";
 import { useModel } from "@/store/ModelStore";
 import type { EvidenceCard } from "@/types/evidence";
-import { buildStructuredConfidenceRationale, buildVendorEvidenceCards } from "@/services/evidenceBuilder";
+import { buildVendorEvidenceCards } from "@/services/evidenceBuilder";
 import { computeConfidenceBreakdown } from "@/services/confidenceScoring";
 import { isVendorIncluded } from "@/lib/vendorSelection";
 import { EvidenceCardsExpandable } from "./EvidenceCardsExpandable";
 import { ConfidenceBreakdownView } from "./ConfidenceBreakdownView";
-import { ConfidenceRationaleExpandable } from "./ConfidenceRationaleExpandable";
 import { VendorBulkControls } from "./VendorBulkControls";
 import { SecStatusBadge } from "@/components/sec/SecStatusBadge";
 import { ExternalLink } from "lucide-react";
@@ -38,13 +37,9 @@ export function VendorRecommendationTable() {
     );
   };
 
-  const resolveConfidence = (v: Vendor, cards: EvidenceCard[]) => {
+  const resolveConfidence = (v: Vendor) => {
     if (!selectedSegments.length) {
-      return {
-        confidence: v.confidence,
-        breakdown: v.confidenceBreakdown,
-        rationale: v.confidenceRationaleDetailed ?? v.confidenceRationale ?? v.rationale ?? "",
-      };
+      return { confidence: v.confidence, breakdown: v.confidenceBreakdown };
     }
     const breakdown = computeConfidenceBreakdown(
       selectedSegments,
@@ -52,15 +47,7 @@ export function VendorRecommendationTable() {
       undefined,
       v.secRevenue,
     );
-    const confidence = breakdown.finalConfidence;
-    const rationale = buildStructuredConfidenceRationale(
-      confidence,
-      breakdown,
-      cards,
-      selectedSegments,
-      { companyName: v.name, forScoping: true },
-    );
-    return { confidence, breakdown, rationale };
+    return { confidence: breakdown.finalConfidence, breakdown };
   };
   const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
 
@@ -104,7 +91,6 @@ export function VendorRecommendationTable() {
               <TableHead className="min-w-[8rem]">Company</TableHead>
               <TableHead className="cell-compact">Ticker</TableHead>
               <TableHead className="text-right cell-compact min-w-[5.5rem]">Confidence</TableHead>
-              <TableHead className="cell-prose">Confidence rationale</TableHead>
               <TableHead className="cell-prose-wide">Evidence</TableHead>
               <TableHead className="min-w-[6rem]">SEC status</TableHead>
               <TableHead className="text-right cell-compact">Total co. rev</TableHead>
@@ -120,7 +106,7 @@ export function VendorRecommendationTable() {
                 v.totalCompanyRevenue ??
                 (v.revenue > 0 ? v.revenue : null);
               const cards = resolveEvidenceCards(v);
-              const { confidence, breakdown, rationale } = resolveConfidence(v, cards);
+              const { confidence, breakdown } = resolveConfidence(v);
               return (
                 <TableRow
                   key={v.id}
@@ -162,9 +148,6 @@ export function VendorRecommendationTable() {
                       segmentName={v.matchedSegment}
                     />
                   </TableCell>
-                  <TableCell className="cell-prose">
-                    <ConfidenceRationaleExpandable rationale={rationale} confidence={confidence} />
-                  </TableCell>
                   <TableCell className="cell-prose-wide">
                     <EvidenceCardsExpandable
                       cards={cards}
@@ -181,9 +164,6 @@ export function VendorRecommendationTable() {
                     {total != null ? fmtUsdM(total) : "—"}
                   </TableCell>
                   <TableCell className="text-xs">{v.fiscalYear ?? v.secRevenue?.fiscalYear ?? "—"}</TableCell>
-                  <TableCell className="text-xs font-mono break-all leading-snug">
-                    {v.revenueMetric ?? "—"}
-                  </TableCell>
                   <TableCell>
                     {v.filingUrl ? (
                       <a

@@ -15,15 +15,16 @@ import { SecStatusBadge } from "@/components/sec/SecStatusBadge";
 import { SecMockBanner } from "@/components/sec/SecMockBanner";
 import { PageShell } from "@/components/layout/PageShell";
 
+const TH = "min-w-0 whitespace-normal break-words leading-snug";
+
 export default function RevenueMapping() {
   const {
     includedVendors,
     updateVendor,
     tam,
     baseRevenue,
-    primarySegment,
-    selectedSegments,
     vendorUniverseSummary,
+    selectedSegments,
   } = useModel();
   const filingKeywords = keywordsForSegments(selectedSegments);
   const navigate = useNavigate();
@@ -36,27 +37,30 @@ export default function RevenueMapping() {
   };
 
   return (
-    <PageShell>
+    <PageShell className="revenue-mapping-page">
       <div className="mb-4">
         <SecMockBanner />
       </div>
-      <div className="flex items-end justify-between mb-6">
-        <div>
+
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
+        <div className="min-w-0 flex-1">
           <div className="mds-eyebrow mb-1">Step 2 · Revenue mapping</div>
-          <h1 className="text-2xl font-semibold text-mds-navy">Segment revenue attribution</h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-3xl leading-relaxed">
+          <h1 className="text-2xl font-semibold text-mds-navy break-words">
+            Segment revenue attribution
+          </h1>
+          <p className="text-sm text-muted-foreground mt-2 leading-relaxed break-words">
             {REVENUE_HELPER_TEXT} Showing {included.length} included vendor(s)
             {vendorUniverseSummary.excluded > 0
               ? ` (${vendorUniverseSummary.excluded} excluded at scoping).`
               : "."}
           </p>
         </div>
-        <Button onClick={() => navigate("/model")} className="gap-2">
-          Open Market Model Engine <ChevronRight className="h-4 w-4" />
+        <Button onClick={() => navigate("/model")} className="gap-2 shrink-0 self-start">
+          Open Market Model Engine <ChevronRight className="h-4 w-4 shrink-0" />
         </Button>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="revenue-kpi-grid">
         <Kpi label="Vendors included" value={`${included.length}`} sub={`${vendorUniverseSummary.total} in universe`} />
         <Kpi
           label="Avg confidence"
@@ -69,42 +73,45 @@ export default function RevenueMapping() {
           label="Preliminary TAM"
           value={fmtUsdB(tam)}
           sub={
-            <span className="text-mds-success inline-flex items-center gap-1">
-              <TrendingUp className="h-3 w-3" /> Bottom-up
+            <span className="text-mds-success inline-flex flex-wrap items-center gap-1">
+              <TrendingUp className="h-3 w-3 shrink-0" /> Bottom-up
             </span>
           }
         />
       </div>
 
-      <div className="desktop-table-panel desktop-table-scroll scrollbar-visible">
-        <Table className="desktop-data-table desktop-data-table-wide">
+      <p className="text-xs text-muted-foreground mb-2 break-words">
+        Scroll horizontally to see all columns — text wraps inside each cell.
+      </p>
+
+      <div className="desktop-table-panel desktop-table-scroll scrollbar-visible w-full max-w-full">
+        <Table className="desktop-data-table revenue-data-table">
           <TableHeader>
             <TableRow>
-              <TableHead>Vendor</TableHead>
-              <TableHead>Ticker</TableHead>
-              <TableHead className="text-right">Total co. rev ($M)</TableHead>
-              <TableHead>FY</TableHead>
-              <TableHead>Filing</TableHead>
-              <TableHead>Filing date</TableHead>
-              <TableHead>SEC link</TableHead>
-              <TableHead className="cell-prose-wide">10-K excerpt (Item 1)</TableHead>
-              <TableHead className="text-right">Est. share</TableHead>
-              <TableHead className="text-right">Segment rev ($M)</TableHead>
-              <TableHead>SEC status</TableHead>
-              <TableHead className="cell-prose">Confidence rationale</TableHead>
-              <TableHead className="cell-compact">Status</TableHead>
-              <TableHead className="min-w-[10rem]">Notes</TableHead>
+              <TableHead className={`${TH} min-w-[7rem]`}>Vendor</TableHead>
+              <TableHead className={`${TH} min-w-[4rem]`}>Ticker</TableHead>
+              <TableHead className={`${TH} min-w-[7rem] text-right`}>Total co. rev ($M)</TableHead>
+              <TableHead className={`${TH} min-w-[3rem]`}>FY</TableHead>
+              <TableHead className={`${TH} min-w-[4rem]`}>Filing</TableHead>
+              <TableHead className={`${TH} min-w-[6rem]`}>Filing date</TableHead>
+              <TableHead className={`${TH} min-w-[5rem]`}>SEC link</TableHead>
+              <TableHead className={`${TH} min-w-[14rem]`}>10-K excerpt (Item 1)</TableHead>
+              <TableHead className={`${TH} min-w-[6rem] text-right`}>Segment rev ($M)</TableHead>
+              <TableHead className={`${TH} min-w-[9rem]`}>SEC status</TableHead>
+              <TableHead className={`${TH} min-w-[12rem]`}>Confidence rationale</TableHead>
+              <TableHead className={`${TH} min-w-[8rem]`}>Status</TableHead>
+              <TableHead className={`${TH} min-w-[10rem]`}>Notes</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {included.map((v) => (
               <TableRow key={v.id} className="align-top">
-                <TableCell className="font-medium">{v.name}</TableCell>
-                <TableCell className="font-mono text-xs">{v.ticker}</TableCell>
+                <TableCell className="font-medium break-words">{v.name}</TableCell>
+                <TableCell className="font-mono text-xs break-all">{v.ticker}</TableCell>
                 <TableCell className="text-right">
                   <Input
                     type="number"
-                    className="w-24 ml-auto text-right h-8"
+                    className="w-full max-w-[6.5rem] ml-auto text-right h-8"
                     value={v.totalCompanyRevenue ?? v.revenue}
                     onChange={(e) =>
                       patchRevenue(v.id, {
@@ -114,55 +121,47 @@ export default function RevenueMapping() {
                     }
                   />
                 </TableCell>
-                <TableCell className="text-xs">{v.fiscalYear ?? v.secRevenue?.fiscalYear ?? "—"}</TableCell>
-                <TableCell className="text-xs">{v.filingType ?? v.secRevenue?.formType}</TableCell>
-                <TableCell className="text-xs whitespace-nowrap">{v.secRevenue?.filingDate ?? "—"}</TableCell>
-                <TableCell>
+                <TableCell className="text-xs break-words">
+                  {v.fiscalYear ?? v.secRevenue?.fiscalYear ?? "—"}
+                </TableCell>
+                <TableCell className="text-xs break-words">
+                  {v.filingType ?? v.secRevenue?.formType ?? "—"}
+                </TableCell>
+                <TableCell className="text-xs break-words">
+                  {v.secRevenue?.filingDate ?? "—"}
+                </TableCell>
+                <TableCell className="break-words">
                   {v.filingUrl ? (
                     <a
                       href={v.filingUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-mds-blue text-xs hover:underline"
+                      className="inline-flex flex-wrap items-center gap-1 text-mds-blue text-xs hover:underline"
                     >
-                      View <ExternalLink className="h-3 w-3" />
+                      View <ExternalLink className="h-3 w-3 shrink-0" />
                     </a>
                   ) : (
                     "—"
                   )}
                 </TableCell>
-                <TableCell className="cell-prose-wide">
+                <TableCell className="cell-prose-fluid">
                   <TextExpandable
-                    text={
-                      getFilingNarrativeExcerpt(v.secRevenue, filingKeywords, 360) ||
-                      "—"
-                    }
+                    text={getFilingNarrativeExcerpt(v.secRevenue, filingKeywords, 360) || "—"}
                     maxChars={480}
                   />
                 </TableCell>
                 <TableCell className="text-right">
                   <Input
                     type="number"
-                    className="w-16 ml-auto text-right h-8"
-                    step={0.01}
-                    min={0}
-                    max={1}
-                    value={v.segmentShare ?? v.share / 100}
-                    onChange={(e) => patchRevenue(v.id, { segmentShare: Number(e.target.value) })}
-                  />
-                </TableCell>
-                <TableCell className="text-right">
-                  <Input
-                    type="number"
-                    className="w-24 ml-auto text-right h-8"
+                    className="w-full max-w-[6.5rem] ml-auto text-right h-8"
                     value={v.segmentRevenue ?? 0}
                     onChange={(e) => updateVendor(v.id, { segmentRevenue: Number(e.target.value) })}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className="min-w-[9rem]">
                   <SecStatusBadge status={v.secDataStatus} retrievedAt={v.secRetrievedAt} compact />
                 </TableCell>
-                <TableCell className="cell-prose">
+                <TableCell className="cell-prose-fluid">
                   <TextExpandable
                     text={v.confidenceRationale ?? v.rationale ?? ""}
                     maxChars={400}
@@ -178,7 +177,7 @@ export default function RevenueMapping() {
                       })
                     }
                   >
-                    <SelectTrigger className="h-8 w-28">
+                    <SelectTrigger className="h-auto min-h-8 w-full min-w-[8.5rem] py-1.5 whitespace-normal">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -191,7 +190,7 @@ export default function RevenueMapping() {
                 <TableCell>
                   <Textarea
                     rows={2}
-                    className="min-h-[3.5rem] text-sm w-full min-w-[10rem] resize-y"
+                    className="min-h-[3.5rem] text-sm w-full min-w-[10rem] resize-y break-words"
                     value={v.notes ?? ""}
                     onChange={(e) => updateVendor(v.id, { notes: e.target.value })}
                   />
@@ -201,7 +200,7 @@ export default function RevenueMapping() {
           </TableBody>
         </Table>
         {included.length === 0 && (
-          <p className="p-6 text-sm text-muted-foreground text-center">
+          <p className="p-6 text-sm text-muted-foreground text-center break-words">
             No vendors included. Return to Scoping Expert and include at least one vendor.
           </p>
         )}
@@ -222,12 +221,24 @@ function Kpi({
   accent?: boolean;
 }) {
   return (
-    <div className={`mds-kpi ${accent ? "bg-mds-navy text-white border-mds-navy" : ""}`}>
-      <div className={`text-xs ${accent ? "text-white/70" : "text-muted-foreground"}`}>{label}</div>
-      <div className={`text-2xl font-semibold mt-2 tabular-nums ${accent ? "text-white" : "text-mds-navy"}`}>
+    <div className={`mds-kpi min-w-0 ${accent ? "bg-mds-navy text-white border-mds-navy" : ""}`}>
+      <div
+        className={`text-xs break-words ${accent ? "text-white/70" : "text-muted-foreground"}`}
+      >
+        {label}
+      </div>
+      <div
+        className={`text-2xl font-semibold mt-2 tabular-nums break-words ${
+          accent ? "text-white" : "text-mds-navy"
+        }`}
+      >
         {value}
       </div>
-      <div className={`text-xs mt-1 ${accent ? "text-white/80" : "text-muted-foreground"}`}>{sub}</div>
+      <div
+        className={`text-xs mt-1 break-words ${accent ? "text-white/80" : "text-muted-foreground"}`}
+      >
+        {sub}
+      </div>
     </div>
   );
 }

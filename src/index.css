@@ -130,6 +130,38 @@
     @apply min-w-[20rem] max-w-[36rem] text-xs leading-relaxed sm:text-sm sm:leading-relaxed;
   }
 
+  /* Step 2: no max-width cap — content wraps inside horizontally scrollable table */
+  .cell-prose-fluid {
+    @apply min-w-[14rem] text-xs leading-relaxed sm:text-sm sm:leading-relaxed break-words;
+  }
+
+  .revenue-mapping-page {
+    @apply pb-10 min-w-0;
+  }
+
+  .revenue-mapping-page .desktop-table-scroll {
+    @apply pb-3;
+  }
+
+  .revenue-data-table {
+    min-width: 96rem;
+  }
+
+  .revenue-data-table th {
+    @apply px-3 py-3 leading-snug normal-case;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .revenue-data-table td {
+    @apply px-3 py-3;
+  }
+
+  .revenue-kpi-grid {
+    @apply grid gap-4 mb-6;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  }
+
   /* Visible scrollbars for wide tables and summary panels (desktop) */
   .scrollbar-visible {
     scrollbar-width: thin;
