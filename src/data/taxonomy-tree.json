@@ -1,0 +1,1056 @@
+{
+  "id": "root",
+  "level": "L0",
+  "name": "Root",
+  "path": [],
+  "children": [
+    {
+      "id": "horizontal",
+      "level": "L0",
+      "name": "Horizontal",
+      "path": [
+        "Horizontal"
+      ],
+      "children": [
+        {
+          "id": "horizontal-tech",
+          "level": "L1",
+          "name": "Tech",
+          "path": [
+            "Horizontal",
+            "Tech"
+          ],
+          "children": [
+            {
+              "id": "horizontal-tech-software",
+              "level": "L2",
+              "name": "Software",
+              "path": [
+                "Horizontal",
+                "Tech",
+                "Software"
+              ],
+              "children": [
+                {
+                  "id": "horizontal-tech-software-development-deployment",
+                  "level": "L3",
+                  "name": "Development & Deployment",
+                  "path": [
+                    "Horizontal",
+                    "Tech",
+                    "Software",
+                    "Development & Deployment"
+                  ],
+                  "children": [
+                    {
+                      "id": "horizontal-tech-software-development-deployment-analytics-and-business-intelligence-software",
+                      "level": "L4",
+                      "name": "Analytics and Business Intelligence Software",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Development & Deployment",
+                        "Analytics and Business Intelligence Software"
+                      ],
+                      "children": [],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Software used to aggregate, analyze, visualize, and report on data to support operational and strategic decision-making.",
+                      "expandedDefinition": "Software used to aggregate, model, analyze, visualize, and operationalize structured and unstructured data to support operational, tactical, and strategic decision-making across an organization. Products in this market enable business users, analysts, and executives to monitor performance, identify trends, investigate business drivers, and generate actionable insights from enterprise data.\r\n\r\nCore capabilities typically include dashboards, reporting, ad hoc querying, KPI tracking, data visualization, OLAP analysis, semantic modeling, embedded analytics, natural language querying, and self-service analytics interfaces. More advanced platforms may also incorporate augmented analytics, AI-assisted insight generation, forecasting, anomaly detection, and real-time operational analytics.\r\n\r\nThe defining characteristic of this segment is that the software sits at the analytical consumption and decision-support layer of the data stack. Unlike data management software, which focuses on storing, transforming, governing, and moving data, analytics and BI platforms are primarily used to interpret and present information to business users in a consumable and actionable form. Similarly, unlike operational applications that execute workflows directly, BI software is generally used to inform decisions, monitor operations, and evaluate performance across functions such as finance, sales, marketing, operations, and executive management.\r\n\r\nProducts in this category are typically purchased by business intelligence teams, data and analytics organizations, finance teams, operational leaders, and executive stakeholders. Competitive differentiation is often driven by ease of use, visualization quality, semantic modeling flexibility, scalability, real-time analytics performance, governance capabilities, and integration with broader enterprise data ecosystems."
+                    },
+                    {
+                      "id": "horizontal-tech-software-development-deployment-data-management-software",
+                      "level": "L4",
+                      "name": "Data Management Software",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Development & Deployment",
+                        "Data Management Software"
+                      ],
+                      "children": [],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Software used to ingest, store, transform, govern, organize, and operationalize enterprise data assets across databases, warehouses, lakes, and pipelines. This market includes the tooling that creates trusted, accessible, and usable data foundations for analytics, applications, and AI systems, rather than the analytics or application layers that consume the data. Typical capabilities include data integration, ETL/ELT, metadata management, governance, lineage, data quality, master data management, replication, and database administration.",
+                      "expandedDefinition": "Software used to ingest, integrate, transform, organize, govern, and operationalize enterprise data across applications, analytics environments, and AI systems. Products in this market manage how data moves through the enterprise, how it is standardized and governed, and how it is prepared for downstream consumption by applications, business users, and machine learning systems.\r\n\r\nCore capabilities typically include ETL and ELT pipelines, data integration, data orchestration, metadata management, data lineage, data quality monitoring, master data management, cataloging, governance workflows, replication, schema management, and data preparation. Many platforms also support workflow automation, policy enforcement, observability, and cross-environment synchronization across cloud, on-premise, and hybrid data architectures.\r\n\r\nThe defining characteristic of Data Management Software is that it governs the lifecycle, movement, usability, and control of data across systems rather than serving as the operational database where applications directly store and retrieve runtime data. These products sit above and around databases, warehouses, lakes, and operational systems to create trusted, interoperable, and reusable enterprise data environments.\r\n\r\nData Management Software is distinct from:\r\n\r\nDatabase Infrastructure, which provides the underlying runtime data storage and query engine itself\r\nAnalytics and Business Intelligence Software, which consumes prepared data to generate reporting and insights\r\nIntegration and Orchestration Middleware, which focuses on cross-system workflow coordination rather than long-term data governance and management\r\n\r\nProducts in this segment are typically purchased by data engineering teams, analytics organizations, platform teams, and enterprise IT functions. Competitive differentiation is often driven by scalability, interoperability, governance depth, pipeline automation, metadata intelligence, data quality capabilities, and support for modern distributed data architectures."
+                    },
+                    {
+                      "id": "horizontal-tech-software-development-deployment-application-development-and-testing-software",
+                      "level": "L4",
+                      "name": "Application Development and Testing Software",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Development & Deployment",
+                        "Application Development and Testing Software"
+                      ],
+                      "children": [],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Software used to design, code, test, debug, version, and maintain applications throughout the software development lifecycle.",
+                      "expandedDefinition": "Software used by developers, engineering teams, and IT organizations to design, build, test, debug, secure, deploy, and maintain software applications throughout the software development lifecycle (SDLC). This market encompasses the tooling, environments, and platforms that enable organizations to create and continuously improve software products across web, mobile, desktop, cloud, and embedded environments.\r\n\r\nCore capabilities typically include integrated development environments (IDEs), source code management, version control, collaborative coding, build automation, CI/CD pipelines, automated testing, quality assurance, debugging, application performance testing, developer security testing, release management, and software lifecycle management. Many platforms also support code review workflows, dependency management, containerized development environments, and AI-assisted software development capabilities such as code generation and developer copilots.\r\n\r\nThe defining characteristic of this market is that the software is used primarily by engineering and development teams to create and maintain software itself, rather than to operate business workflows or production infrastructure. These products sit within the software engineering toolchain and are tightly integrated into developer workflows, release processes, and application lifecycle governance.\r\n\r\nWithin the market, major subsegments often include:\r\n\r\nDeveloper tooling (IDEs, coding environments, repositories)\r\nDevOps and CI/CD tooling (build, deployment, release automation)\r\nApplication testing software (functional, regression, performance, and security testing)\r\nApplication lifecycle management (ALM) and developer collaboration tools\r\nDeveloper productivity and observability tooling\r\nAI-assisted software development platforms\r\n\r\nThis category is distinct from:\r\n\r\nInfrastructure software, which manages runtime compute, storage, and networking environments\r\nIT operations management software, which monitors and operates production systems after deployment\r\nIntegration and orchestration middleware, which connects applications and workflows\r\nAI infrastructure software, which is specifically focused on developing and operationalizing AI models rather than general-purpose application development\r\n\r\nProducts in this market are typically purchased by engineering organizations, platform teams, DevOps teams, and CIO/CTO organizations. Competitive differentiation is often driven by developer productivity gains, ecosystem integration, automation depth, scalability, collaboration support, deployment reliability, security integration, and support for modern cloud-native and AI-driven development workflows."
+                    },
+                    {
+                      "id": "horizontal-tech-software-development-deployment-integration-and-orchestration-middleware",
+                      "level": "L4",
+                      "name": "Integration and Orchestration Middleware",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Development & Deployment",
+                        "Integration and Orchestration Middleware"
+                      ],
+                      "children": [],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Software that connects applications, systems, APIs, and workflows while coordinating data flows and process execution across environments.",
+                      "expandedDefinition": "Software used to connect applications, systems, APIs, databases, services, and workflows while coordinating data exchange and process execution across heterogeneous technology environments. Products in this market enable organizations to integrate fragmented systems, automate cross-platform workflows, synchronize data, and manage interactions between applications operating across cloud, on-premise, hybrid, and edge environments.\r\n\r\nCore capabilities typically include API management, application integration, enterprise service buses (ESBs), workflow orchestration, event streaming, message queuing, data synchronization, low-code integration tooling, robotic process orchestration, and integration-platform-as-a-service (iPaaS) functionality. More advanced platforms may also support real-time event processing, service mesh coordination, process automation, distributed workflow execution, and AI-driven orchestration capabilities.\r\n\r\nThe defining characteristic of this market is that the software acts as the connective and coordination layer between systems rather than serving as the system of record or primary business application itself. These products are primarily designed to enable interoperability, process continuity, and workflow automation across otherwise disconnected enterprise environments.\r\n\r\nWithin enterprise architectures, integration and orchestration middleware often serves several distinct functions:\r\n\r\nApplication integration — connecting SaaS, on-premise, legacy, and cloud applications\r\nAPI management — exposing, securing, governing, and monitoring APIs\r\nWorkflow orchestration — coordinating multi-step business or technical processes across systems\r\nEvent and message management — enabling asynchronous communication and real-time data exchange\r\nAutomation enablement — reducing manual intervention across operational workflows\r\n\r\nThis market is distinct from:\r\n\r\nApplication development software, which focuses on creating software applications themselves\r\nIT operations management software, which monitors and operates infrastructure environments\r\nERP or operational applications, which directly own business workflows and transactional systems of record\r\nData management software, which focuses on storing, governing, and transforming data rather than coordinating application interactions\r\n\r\nProducts in this market are typically purchased by enterprise architecture teams, integration teams, platform engineering organizations, IT operations groups, and digital transformation leaders. Competitive differentiation is often driven by integration breadth, connector ecosystems, scalability, workflow flexibility, low-code capabilities, API governance, real-time processing performance, and ease of integrating legacy and modern cloud-native systems."
+                    },
+                    {
+                      "id": "horizontal-tech-software-development-deployment-ai-infrastructure-and-operations-software",
+                      "level": "L4",
+                      "name": "AI Infrastructure and Operations Software",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Development & Deployment",
+                        "AI Infrastructure and Operations Software"
+                      ],
+                      "children": [
+                        {
+                          "id": "horizontal-tech-software-development-deployment-ai-infrastructure-and-operations-software-ai-build-software",
+                          "level": "L5",
+                          "name": "AI build software",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Development & Deployment",
+                            "AI Infrastructure and Operations Software",
+                            "AI build software"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of AI Infrastructure and Operations Software focused on model creation and training workflows. Products in this market are used by data scientists and ML engineers to prepare features, label data, run experiments, tune hyperparameters, train models, and manage development environments for AI and machine learning work.",
+                          "expandedDefinition": "A subsegment of AI Infrastructure and Operations Software focused on the creation, training, experimentation, and development of machine learning and AI models. Products in this market are used by data scientists, ML engineers, and AI research teams to build models and prepare them for production deployment.\r\n\r\nCore capabilities typically include model training environments, experiment tracking, feature engineering, dataset preparation, data labeling, hyperparameter tuning, notebook environments, distributed training orchestration, vectorization workflows, model evaluation, and collaborative ML development tooling. Many platforms also support foundation model fine-tuning, synthetic data generation, prompt engineering workflows, and integration with GPU and high-performance compute infrastructure.\r\n\r\nThe defining characteristic of AI Build Software is that it supports the pre-production creation and development stage of the AI lifecycle — where models are designed, trained, tested, refined, and validated before deployment into operational environments. These products are optimized around experimentation velocity, model quality, reproducibility, and efficient model development workflows.\r\n\r\nThis segment is distinct from:\r\n\r\nAI Deployment Software, which operationalizes trained models in production environments and manages live inference serving\r\nAI Management Software, which governs, monitors, evaluates, and controls AI systems after deployment\r\nApplication Development and Testing Software, which supports broader software engineering workflows rather than AI-specific model creation\r\n\r\nProducts in this segment are typically purchased by AI engineering teams, data science organizations, research groups, and platform engineering functions. Competitive differentiation is often driven by training scalability, experiment management, developer productivity, compute orchestration, model interoperability, and support for modern generative AI and machine learning workflows."
+                        },
+                        {
+                          "id": "horizontal-tech-software-development-deployment-ai-infrastructure-and-operations-software-ai-deployment-software",
+                          "level": "L5",
+                          "name": "AI deployment software",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Development & Deployment",
+                            "AI Infrastructure and Operations Software",
+                            "AI deployment software"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of AI Infrastructure and Operations Software focused on operationalizing models in production environments. Products in this market provide model serving, inference orchestration, deployment pipelines, runtime scaling, GPU and compute management, and edge or cloud deployment features that make AI models usable in live workflows.",
+                          "expandedDefinition": "A subsegment of AI Infrastructure and Operations Software focused on operationalizing, serving, scaling, and orchestrating AI and machine learning models in production environments. Products in this market are used to make trained models accessible to applications, workflows, users, and downstream systems through reliable, scalable inference infrastructure.\r\n\r\nCore capabilities typically include model serving, inference orchestration, deployment pipelines, endpoint management, GPU orchestration, autoscaling, model routing, runtime optimization, edge deployment, API management, and production inference monitoring. Many platforms also support multi-model orchestration, retrieval-augmented generation (RAG) pipelines, prompt routing, low-latency inference optimization, and hybrid cloud or edge deployment environments.\r\n\r\nThe defining characteristic of AI Deployment Software is that it owns the production delivery and runtime serving stage of the AI lifecycle — ensuring that trained models can be reliably deployed, accessed, scaled, and integrated into live business applications and operational workflows. These products are optimized around latency, reliability, throughput, runtime efficiency, and operational scalability.\r\n\r\nThis segment is distinct from:\r\n\r\nAI Build Software, which focuses on model development, experimentation, and training prior to production deployment\r\nAI Management Software, which governs and monitors deployed AI systems after they are operational\r\nComputing and Storage Software, which manages generalized infrastructure resources rather than AI-specific serving and inference workflows\r\n\r\nProducts in this segment are typically purchased by ML engineering teams, AI platform teams, infrastructure engineering organizations, and enterprise IT functions deploying AI into production. Competitive differentiation is often driven by inference performance, deployment flexibility, orchestration sophistication, scalability, GPU efficiency, and support for complex multi-model AI architectures."
+                        },
+                        {
+                          "id": "horizontal-tech-software-development-deployment-ai-infrastructure-and-operations-software-ai-management-software",
+                          "level": "L5",
+                          "name": "AI management software",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Development & Deployment",
+                            "AI Infrastructure and Operations Software",
+                            "AI management software"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of AI Infrastructure and Operations Software focused on the post-deployment governance and operational management of AI systems. Products in this market typically provide observability, evaluation, explainability, compliance, policy enforcement, lineage, performance monitoring, and AI risk management across deployed models and AI-enabled applications.",
+                          "expandedDefinition": "A subsegment of AI Infrastructure and Operations Software focused on monitoring, governing, evaluating, securing, and controlling AI systems after deployment into production environments. Products in this market are used to ensure that operational AI systems remain reliable, compliant, observable, explainable, and aligned with organizational policies and performance expectations over time.\r\n\r\nCore capabilities typically include model monitoring, observability, drift detection, performance evaluation, explainability, governance controls, policy management, audit logging, lineage tracking, AI security monitoring, bias detection, compliance management, and operational risk management. Many platforms also support human feedback workflows, red teaming, AI evaluation frameworks, usage analytics, and governance controls for generative AI and autonomous systems.\r\n\r\nThe defining characteristic of AI Management Software is that it owns the post-deployment governance and operational oversight stage of the AI lifecycle. These products are optimized around visibility, accountability, reliability, compliance, and risk management for AI systems already running in production environments.\r\n\r\nThis segment is distinct from:\r\n\r\nAI Build Software, which focuses on model creation and training workflows prior to deployment\r\nAI Deployment Software, which focuses on runtime serving, inference infrastructure, and operational deployment\r\nSecurity Software, which manages broader enterprise cybersecurity rather than AI-specific operational governance and observability\r\n\r\nProducts in this segment are typically purchased by AI governance teams, platform engineering organizations, risk and compliance groups, security teams, and enterprise AI operations functions. Competitive differentiation is often driven by observability depth, governance sophistication, explainability capabilities, compliance tooling, policy enforcement, and support for enterprise-scale AI accountability and lifecycle management."
+                        }
+                      ],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Software used to build, deploy, operate, monitor, govern, and scale AI systems and machine learning workloads. This category includes the infrastructure and operational tooling that sits beneath AI-enabled applications, supporting model development, inference serving, orchestration, observability, governance, and lifecycle management. The market is typically used by data science, ML engineering, platform engineering, and AI operations teams that need to industrialize AI workloads across production environments.",
+                      "expandedDefinition": "Software used to build, deploy, operate, monitor, govern, and scale AI systems and machine learning workloads. This category includes the infrastructure and operational tooling that sits beneath AI-enabled applications, supporting model development, inference serving, orchestration, observability, governance, and lifecycle management.\r\n\r\nThe market is typically used by data science, ML engineering, platform engineering, and AI operations teams that need to industrialize AI workloads across production environments. Buyers evaluate these products on scalability, performance, reliability, governance, and the ability to move models from experimentation into repeatable production use across cloud, on-premise, and hybrid deployments."
+                    }
+                  ],
+                  "isHorizontal": true,
+                  "additiveToSoftwareMarket": true,
+                  "definition": "The software layer used by engineering, platform, and IT teams to build, test, integrate, deploy, operate, and improve software systems. This category sits between the application layer and the infrastructure layer, and it includes the tools that shape software delivery speed, reliability, security, and maintainability across modern development environments.",
+                  "expandedDefinition": "The software layer used by engineering, platform, and IT teams to build, test, integrate, deploy, operate, and improve software systems and data/AI workloads. This category sits between the application layer and the infrastructure layer, and it includes the tools that shape release velocity, delivery reliability, code quality, and runtime automation across modern development environments.\r\n\r\nProducts in this layer are typically purchased by developers, DevOps teams, platform engineers, and application owners to reduce friction in software creation and delivery. The market includes coding tools, build and release automation, testing systems, developer collaboration, and operational tooling for software delivery. It is distinct from production infrastructure because it helps teams create and ship software rather than host or run the business application itself."
+                },
+                {
+                  "id": "horizontal-tech-software-applications",
+                  "level": "L3",
+                  "name": "Applications",
+                  "path": [
+                    "Horizontal",
+                    "Tech",
+                    "Software",
+                    "Applications"
+                  ],
+                  "children": [
+                    {
+                      "id": "horizontal-tech-software-applications-productivity-applications",
+                      "level": "L4",
+                      "name": "Productivity Applications",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Applications",
+                        "Productivity Applications"
+                      ],
+                      "children": [
+                        {
+                          "id": "horizontal-tech-software-applications-productivity-applications-communication-applications",
+                          "level": "L5",
+                          "name": "Communication Applications",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "Productivity Applications",
+                            "Communication Applications"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "Applications used to facilitate real-time and asynchronous communication, coordination, and collaboration between people and teams.",
+                          "expandedDefinition": "Applications used to facilitate real-time and asynchronous communication, coordination, and collaboration between individuals, teams, and organizations. Products in this market are designed to support interpersonal interaction, information exchange, meeting coordination, and collaborative work execution across distributed workforces and enterprise environments.\r\n\r\nCore capabilities typically include messaging, email, video conferencing, voice and telephony, team collaboration channels, meeting management, calendars, presence indicators, notifications, file sharing, collaborative workspaces, and lightweight task coordination. Many modern platforms also incorporate workflow integrations, enterprise search, AI-assisted meeting summarization, conversational copilots, and embedded collaboration features across business applications.\r\n\r\nThe defining characteristic of communication applications is that they serve as the primary interaction and coordination layer between users rather than functioning as systems of record for structured business transactions or enterprise data. These products are generally horizontal platforms used broadly across organizations regardless of industry or department.\r\n\r\nThis segment typically includes:\r\n\r\nTeam messaging and collaboration platforms\r\nEnterprise email and calendaring systems\r\nVideo conferencing and virtual meeting platforms\r\nUnified communications and VoIP systems\r\nInternal communications and employee engagement platforms\r\nCollaborative workspace and lightweight coordination tools\r\n\r\nCommunication applications are distinct from:\r\n\r\nContent Management Applications, which focus on storing, organizing, governing, and publishing information assets and documents\r\nCustomer Experience applications, which manage external customer support and service interactions\r\nERP and operational systems, which manage structured business processes and transactions\r\nSocial media or consumer communication platforms, unless specifically deployed for enterprise workplace collaboration\r\n\r\nProducts in this market are typically purchased by IT departments, workplace productivity teams, CIO organizations, and operations leaders. Competitive differentiation is often driven by usability, real-time collaboration capabilities, reliability, ecosystem integration, interoperability, security and compliance features, cross-platform accessibility, and increasingly AI-enabled productivity and communication assistance."
+                        },
+                        {
+                          "id": "horizontal-tech-software-applications-productivity-applications-content-management-applications",
+                          "level": "L5",
+                          "name": "Content Management Applications",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "Productivity Applications",
+                            "Content Management Applications"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of Productivity Applications focused on creating, organizing, storing, publishing, governing, and retrieving digital content and enterprise information. Products commonly include document management systems, enterprise content management platforms, knowledge bases, digital asset management systems, and web content management platforms.",
+                          "expandedDefinition": "A subsegment of Productivity Applications focused on creating, organizing, storing, publishing, governing, and retrieving digital content and enterprise information. Products commonly include document management systems, enterprise content management platforms, knowledge bases, digital asset management systems, and web content management platforms.\r\n\r\nThe defining feature is that the software manages information assets and content lifecycles rather than transactional business workflows. These products help organizations control versioning, permissions, retention, search, publishing, and access to institutional knowledge and unstructured content across teams and departments."
+                        }
+                      ],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Applications used to support employee communication, collaboration, knowledge work, and day-to-day productivity.",
+                      "expandedDefinition": "Applications used to support day-to-day knowledge work, communication, coordination, information creation, and organizational productivity across individuals and teams. Products in this market are designed to improve how employees communicate, collaborate, create content, manage information, and execute routine work within enterprise environments.\r\n\r\nThis segment generally includes two major subsegments:\r\n\r\nCommunication Applications — software focused on interpersonal and team communication, coordination, and collaboration, including messaging, email, meetings, video conferencing, calendars, team workspaces, and collaborative task management.\r\nContent Management Applications — software focused on the creation, organization, storage, retrieval, governance, and publishing of digital content and enterprise information, including documents, files, records, knowledge bases, media assets, and web content.\r\n\r\nThe defining characteristic of productivity applications is that they primarily support horizontal employee productivity and information work rather than owning transactional business processes or operational systems of record. These products are typically used broadly across organizations regardless of industry or business function and are often deeply embedded into daily employee workflows.\r\n\r\nCommon capabilities across the segment include:\r\n\r\nCommunication and collaboration workflows\r\nDocument and file management\r\nKnowledge sharing and search\r\nContent authoring and publishing\r\nTask and workflow coordination\r\nPermissions and access controls\r\nEnterprise search and information retrieval\r\nWorkflow approvals and lightweight process automation\r\n\r\nThis category is distinct from:\r\n\r\nEnterprise Resource Planning (ERP) applications, which manage structured operational and transactional processes\r\nCustomer Operations applications, which manage external customer-facing workflows\r\nAnalytics and BI software, which focuses on decision support and data analysis\r\nApplication development software, which is used primarily by engineering teams to build software\r\n\r\nProducts in this market are typically purchased by CIO organizations, workplace productivity teams, IT departments, operations leaders, and business function owners. Competitive differentiation is often driven by usability, collaboration depth, ecosystem integration, workflow flexibility, content governance capabilities, cross-platform accessibility, and increasingly AI-assisted productivity features."
+                    },
+                    {
+                      "id": "horizontal-tech-software-applications-customer-relationship-management-crm-applications",
+                      "level": "L4",
+                      "name": "Customer Relationship Management (CRM) Applications",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Applications",
+                        "Customer Relationship Management (CRM) Applications"
+                      ],
+                      "children": [
+                        {
+                          "id": "horizontal-tech-software-applications-customer-relationship-management-crm-applications-marketing-advertising-and-sales-applications",
+                          "level": "L5",
+                          "name": "Marketing, Advertising, and Sales Applications",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "Customer Relationship Management (CRM) Applications",
+                            "Marketing, Advertising, and Sales Applications"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of CRM Applications focused on pre-sale customer acquisition, demand generation, campaign execution, pipeline creation, sales enablement, and revenue growth. Products in this market typically support marketing automation, advertising operations, lead management, sales force automation, attribution, revenue operations, and forecasting.",
+                          "expandedDefinition": "A subsegment of CRM Applications focused on pre-sale customer acquisition, demand generation, pipeline development, and revenue creation workflows. Products in this market are used to attract prospective customers, convert interest into qualified opportunities, manage active sales processes, and optimize commercial performance across marketing and sales organizations.\r\n\r\nCore capabilities typically include marketing automation, campaign management, lead generation, lead scoring, customer segmentation, digital advertising management, account-based marketing, sales force automation, pipeline management, opportunity tracking, quoting, forecasting, revenue operations, and sales analytics. Many platforms also support customer journey orchestration, attribution modeling, territory management, sales engagement, partner channel management, and AI-driven prospecting or conversion optimization.\r\n\r\nThe defining characteristic of Marketing, Advertising, and Sales Applications is that the software owns the pre-sale portion of the customer lifecycle — generating demand, managing prospect engagement, converting opportunities, and driving revenue growth before or during the purchasing decision. These systems are primarily optimized around pipeline velocity, conversion efficiency, customer acquisition, and revenue generation.\r\n\r\nThis segment is distinct from:\r\n\r\nCX Applications, which focus on post-sale customer support, service delivery, retention, and customer success workflows\r\nCommerce Applications, which own the transaction and purchasing workflow itself\r\nAnalytics and Business Intelligence Software, which provides reporting and analysis but does not operationally manage customer acquisition or sales execution workflows\r\n\r\nProducts in this segment are typically purchased by marketing organizations, sales teams, revenue operations groups, and commercial leadership teams. Competitive differentiation is often driven by automation sophistication, customer data integration, omnichannel engagement capabilities, attribution accuracy, workflow configurability, forecasting quality, and support for increasingly data-driven go-to-market operations."
+                        },
+                        {
+                          "id": "horizontal-tech-software-applications-customer-relationship-management-crm-applications-cx-applications",
+                          "level": "L5",
+                          "name": "CX Applications",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "Customer Relationship Management (CRM) Applications",
+                            "CX Applications"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of CRM Applications focused on post-sale and in-life customer support, service delivery, customer success, and issue resolution. Products in this market typically support contact centers, ticketing, omnichannel service, self-service, field service, case management, and customer retention workflows.",
+                          "expandedDefinition": "A subsegment of CRM Applications focused on post-sale customer engagement, service delivery, issue resolution, customer success, and retention workflows. Products in this market are used to manage ongoing relationships with customers after acquisition, ensuring service continuity, customer satisfaction, account health, and long-term retention.\r\n\r\nCore capabilities typically include customer support and ticketing, contact center operations, omnichannel service management, case management, self-service portals, knowledge management, customer success management, onboarding workflows, service analytics, field service coordination, and customer feedback management. Many platforms also support AI-assisted support, workforce management, conversational service interfaces, account health scoring, and proactive customer engagement workflows.\r\n\r\nThe defining characteristic of CX Applications is that the software owns the post-sale customer relationship and service lifecycle rather than the demand generation or revenue acquisition process. These systems are optimized around customer satisfaction, issue resolution, retention, expansion, service quality, and long-term customer value after a customer relationship has already been established.\r\n\r\nThis segment is distinct from:\r\n\r\nMarketing, Advertising, and Sales Applications, which focus on customer acquisition, pipeline generation, and pre-sale revenue creation\r\nCommerce Applications, which manage the transaction and purchasing experience itself\r\nProductivity Applications, which facilitate internal employee collaboration rather than customer-facing support workflows\r\n\r\nProducts in this segment are typically purchased by customer support organizations, customer success teams, contact center operations, service organizations, and account management teams. Competitive differentiation is often driven by omnichannel support capabilities, workflow automation, service analytics, AI-assisted support, customer engagement orchestration, and the ability to improve retention and long-term customer satisfaction at scale."
+                        }
+                      ],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Customer Relationship Management (CRM) Applications includes customer-facing business applications used to manage commercial workflows across marketing, sales, commerce, support, and customer engagement. CRM applications centralize customer data and coordinate the processes that acquire, convert, support, and retain customers, making them the operational system of engagement for commercial teams. Products are typically differentiated by ownership of customer lifecycle workflows and integration with customer data systems.",
+                      "expandedDefinition": "A horizontal application layer used to manage customer relationships, engagement, and lifecycle workflows across marketing, sales, and service. CRM applications centralize customer data and coordinate the processes that acquire, convert, support, and retain customers, making them the operational system of engagement for commercial teams.\r\n\r\nThis layer is defined by ownership of the customer record and the workflows that surround it: lead capture, account management, opportunity tracking, customer communication, support cases, and retention activity. The market is broad, but the core boundary is that CRM owns customer-facing relationship workflows rather than the transaction engine, back-office finance, or supply chain execution."
+                    },
+                    {
+                      "id": "horizontal-tech-software-applications-commerce-applications",
+                      "level": "L4",
+                      "name": "Commerce Applications",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Applications",
+                        "Commerce Applications"
+                      ],
+                      "children": [
+                        {
+                          "id": "horizontal-tech-software-applications-commerce-applications-marketplace-applications",
+                          "level": "L5",
+                          "name": "Marketplace Applications",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "Commerce Applications",
+                            "Marketplace Applications"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of Commerce Applications that supports both single-merchant eCommerce and multi-party marketplace commerce experiences.",
+                          "expandedDefinition": "A subsegment of Commerce Applications focused on enabling and managing buyer-facing digital commerce experiences across online and omnichannel environments. This market includes software used to operate both traditional single-merchant eCommerce businesses and multi-vendor marketplace platforms, provided that the software owns the core commerce workflow through which buyers discover, evaluate, purchase, and manage products or services.\r\n\r\nCore capabilities typically include storefront management, product catalogs, merchandising, search and discovery, pricing and promotions, shopping carts, checkout, customer accounts, order management, subscriptions, fulfillment coordination, and post-purchase commerce workflows. Marketplace-oriented platforms may additionally support seller onboarding, multi-vendor catalog management, commission and take-rate management, ratings and reviews, and multi-party order orchestration.\r\n\r\nThe defining characteristic of Marketplace Applications is that the software owns the customer-facing commerce transaction experience and operational buying workflow, regardless of whether the merchant model is:\r\n\r\nSingle-merchant retail or direct-to-consumer commerce\r\nMulti-vendor marketplace commerce\r\nB2B commerce and procurement\r\nSubscription commerce\r\nDigital goods or services marketplaces\r\n\r\nThis segment therefore encompasses:\r\n\r\nTraditional eCommerce platforms\r\nMarketplace commerce platforms\r\nOmnichannel commerce management systems\r\nB2B commerce platforms\r\nSubscription commerce platforms\r\nDigital marketplace infrastructure\r\n\r\nMarketplace Applications are distinct from:\r\n\r\nPayment Processors, which manage payment authorization, routing, settlement, and fraud infrastructure rather than the broader buyer commerce experience\r\nCustomer Relationship Management Applications, which manage customer lifecycle engagement outside the transaction workflow itself\r\nSupply Chain Management Applications, which manage sourcing, inventory movement, logistics, and fulfillment network operations rather than customer-facing commerce interactions\r\nProcurement Applications, which govern internal enterprise purchasing workflows rather than external buyer-seller commerce experiences\r\n\r\nProducts in this segment are typically purchased by retailers, brands, digital commerce operators, marketplaces, B2B distributors, subscription businesses, and platform companies. Competitive differentiation is often driven by storefront flexibility, checkout performance, omnichannel capabilities, merchandising sophistication, ecosystem extensibility, scalability, fulfillment integration, and support for increasingly complex commerce and marketplace business models."
+                        },
+                        {
+                          "id": "horizontal-tech-software-applications-commerce-applications-payments-processors",
+                          "level": "L5",
+                          "name": "Payments Processors",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "Commerce Applications",
+                            "Payments Processors"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of Commerce Applications focused on enabling, authorizing, routing, settling, and managing digital payment transactions between buyers, merchants, payment networks, and financial institutions. Products commonly provide payment gateways, merchant acquiring, fraud detection, recurring billing, reconciliation, tokenization, settlement workflows, and multi-currency transaction support.",
+                          "expandedDefinition": "A subsegment of Commerce Applications focused on enabling, authorizing, routing, settling, and managing digital payment transactions between buyers, merchants, financial institutions, and payment networks. Payment processors provide the infrastructure and operational workflows that allow commerce platforms and merchants to securely accept, manage, and reconcile payments across online, in-person, and embedded commerce environments.\r\n\r\nCore capabilities typically include payment authorization, gateway services, transaction routing, merchant acquiring, settlement and reconciliation, fraud detection, tokenization, recurring billing, chargeback management, compliance management, multi-currency support, and integrations with banks, card networks, wallets, and alternative payment methods. Many platforms also provide developer APIs, embedded payments infrastructure, risk scoring, and financial reporting tooling.\r\n\r\nThe defining characteristic of payment processors is that they manage the operational movement, authorization, and settlement of funds within commercial transactions rather than broader merchandising, storefront, or customer engagement workflows. These platforms sit within the transactional infrastructure layer of commerce ecosystems and are often deeply integrated into checkout, subscription, marketplace, and embedded finance workflows.\r\n\r\nPayment processors are distinct from:\r\n\r\nMarketplace Applications, which coordinate multi-party commerce ecosystems and participant interactions\r\neCommerce platforms, which manage storefronts, catalogs, merchandising, and direct merchant operations\r\nCore banking or treasury software, which manages broader financial institution operations\r\nFinancial Applications, which manage accounting, planning, and enterprise financial administration rather than payment transaction processing itself\r\n\r\nProducts in this segment are typically used by merchants, marketplaces, SaaS platforms, financial technology providers, and enterprise commerce organizations. Competitive differentiation is often driven by transaction reliability, global payment coverage, developer tooling, fraud prevention capabilities, settlement speed, compliance support, embedded finance capabilities, and breadth of supported payment methods."
+                        }
+                      ],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "A horizontal application layer used to run digital commerce transactions and commercial experiences across online and omnichannel channels. This category includes the applications that manage storefronts, catalogs, discovery, checkout, order handling, and the transaction experience between buyers and sellers, including both direct merchant commerce and multi-party commerce models.",
+                      "expandedDefinition": "A horizontal application layer used to run digital commerce transactions and commercial experiences across online and omnichannel channels. This category includes the applications that manage storefronts, catalogs, discovery, checkout, order handling, and the transaction experience between buyers and sellers, including both direct merchant commerce and multi-party commerce models.\r\n\r\nCommerce applications sit at the commercial transaction layer of the software stack. They are purchased to create, manage, and optimize the buying experience, while integrating with payments, fulfillment, customer accounts, and post-purchase operations. The market boundary is that these products own the commerce workflow itself rather than the financial processing layer or the supply chain behind it."
+                    },
+                    {
+                      "id": "horizontal-tech-software-applications-engineering-and-production-applications",
+                      "level": "L4",
+                      "name": "Engineering and Production Applications",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Applications",
+                        "Engineering and Production Applications"
+                      ],
+                      "children": [],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Applications used to design products, simulate systems, manage industrial operations, coordinate production, and support engineering workflows in manufacturing and industrial environments. These products sit close to the product design and production floor and are typically evaluated on their ability to support technical design, plant-level execution, quality, and operational coordination.",
+                      "expandedDefinition": "Applications used to design products, simulate systems, manage industrial operations, coordinate production, and support engineering workflows in manufacturing and industrial environments. These products sit close to the product design and production floor and are typically evaluated on their ability to support technical design, plant-level execution, quality, and operational coordination.\r\n\r\nThe market includes software that bridges engineering intent and physical production execution, often with heavy integration into CAD, PLM, MES, plant systems, and industrial data environments. Buyers include engineering, operations, manufacturing, and plant management teams that need software aligned to technical, operational, and production realities."
+                    },
+                    {
+                      "id": "horizontal-tech-software-applications-enterprise-resource-planning-applications",
+                      "level": "L4",
+                      "name": "Enterprise Resource Planning Applications",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Applications",
+                        "Enterprise Resource Planning Applications"
+                      ],
+                      "children": [
+                        {
+                          "id": "horizontal-tech-software-applications-enterprise-resource-planning-applications-financial-applications",
+                          "level": "L5",
+                          "name": "Financial Applications",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "Enterprise Resource Planning Applications",
+                            "Financial Applications"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of Enterprise Resource Planning Applications focused on accounting, treasury, financial planning, billing, tax, audit, and financial reporting workflows. These products are typically systems of record for finance teams and are designed to manage the transactional, control, and planning processes that underpin enterprise financial operations.",
+                          "expandedDefinition": "A subsegment of Enterprise Resource Planning Applications focused on accounting, treasury, financial planning, billing, tax, audit, and financial reporting workflows. These products are typically systems of record for finance teams and are designed to manage the transactional, control, and planning processes that underpin enterprise financial operations.\r\n\r\nThe market owns the financial backbone of the enterprise, including close, consolidation, controls, and reporting. Buyers are finance and controllership organizations that need accuracy, compliance, and visibility into enterprise financial performance."
+                        },
+                        {
+                          "id": "horizontal-tech-software-applications-enterprise-resource-planning-applications-human-capital-management-applications",
+                          "level": "L5",
+                          "name": "Human Capital Management Applications",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "Enterprise Resource Planning Applications",
+                            "Human Capital Management Applications"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of Enterprise Resource Planning Applications focused on recruiting, onboarding, payroll, benefits, workforce administration, talent management, learning, and employee lifecycle workflows. Products in this market are used by HR and people operations teams to manage the workforce as an enterprise asset and to standardize employee-related processes.",
+                          "expandedDefinition": "A subsegment of Enterprise Resource Planning Applications focused on recruiting, onboarding, payroll, benefits, workforce administration, talent management, learning, and employee lifecycle workflows. Products in this market are used by HR and people operations teams to manage the workforce as an enterprise asset and to standardize employee-related processes.\r\n\r\nThis segment owns the employee lifecycle and the administrative systems that support it. The market is defined by workflows around hiring, paying, developing, and managing people rather than broader financial, procurement, or operational administration."
+                        },
+                        {
+                          "id": "horizontal-tech-software-applications-enterprise-resource-planning-applications-procurement-applications",
+                          "level": "L5",
+                          "name": "Procurement Applications",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "Enterprise Resource Planning Applications",
+                            "Procurement Applications"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of ERP Applications used to manage sourcing, purchasing, supplier workflows, and enterprise spend control.",
+                          "expandedDefinition": "A subsegment of ERP Applications focused on managing the sourcing, purchasing, contracting, and supplier management workflows required to procure goods and services for an organization. Procurement applications are typically systems of record for enterprise purchasing operations and are designed to standardize spend management, enforce purchasing controls, optimize supplier relationships, and improve operational efficiency across procurement processes.\r\n\r\nCore capabilities typically include requisition management, purchase order creation, sourcing and RFx workflows, supplier onboarding, vendor management, contract lifecycle management, approval routing, catalog management, invoice matching, spend analytics, procurement compliance, and procurement workflow automation. More advanced platforms may also support supplier risk management, procurement marketplaces, dynamic sourcing, procurement orchestration, and AI-assisted spend optimization.\r\n\r\nThe defining characteristic of procurement applications is that they manage enterprise purchasing and supplier-facing operational workflows rather than broader financial accounting, inventory operations, or customer-facing commerce transactions. These systems are primarily used to control organizational spend, govern supplier interactions, and operationalize procurement policy across the enterprise.\r\n\r\nProcurement applications are distinct from:\r\n\r\nFinancial Applications, which manage accounting, treasury, budgeting, and financial reporting\r\nSupply Chain Management Applications, which focus on inventory movement, logistics, warehousing, and fulfillment operations\r\nCommerce Applications, which facilitate external buying and selling transactions with customers\r\nContract management software, when used purely for legal document workflows outside operational procurement processes\r\n\r\nProducts in this segment are typically purchased by procurement organizations, finance departments, operations teams, and enterprise shared services groups. Competitive differentiation is often driven by supplier network scale, workflow configurability, spend visibility, compliance controls, sourcing intelligence, ERP integration depth, and automation of complex procurement operations."
+                        },
+                        {
+                          "id": "horizontal-tech-software-applications-enterprise-resource-planning-applications-asset-management-applications",
+                          "level": "L5",
+                          "name": "Asset Management Applications",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "Enterprise Resource Planning Applications",
+                            "Asset Management Applications"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "Applications used to track, manage, maintain, and optimize the lifecycle of physical or digital assets. For enterprise software, this usually refers to IT asset management, enterprise asset management, or fixed asset tracking. Typical functionality includes asset inventory, ownership, depreciation, maintenance scheduling, utilization monitoring, lifecycle management, and compliance tracking. The key boundary is that the product manages assets as tracked objects rather than as procurement, finance, or operations transactions more broadly.",
+                          "expandedDefinition": "A subsegment of Enterprise Resource Planning Applications focused on tracking, maintaining, optimizing, and governing the lifecycle of physical or digital enterprise assets. Products commonly support asset inventories, maintenance scheduling, utilization tracking, depreciation management, lifecycle planning, compliance monitoring, and service workflows.\r\n\r\nThis market owns the record and operating view of assets that the organization must maintain over time, such as equipment, facilities, IT assets, or fixed assets. Buyers care about lifecycle control, maintenance visibility, compliance, and the ability to link assets to work orders, financial records, or operational processes."
+                        },
+                        {
+                          "id": "horizontal-tech-software-applications-enterprise-resource-planning-applications-operations-applications",
+                          "level": "L5",
+                          "name": "Operations Applications",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "Enterprise Resource Planning Applications",
+                            "Operations Applications"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "Applications that support the execution, control, and coordination of internal business operations outside of core financial, HR, customer, or supply chain functions. This is a broad operational category that often includes facilities, procurement support, internal service workflows, administrative operations, asset workflows, and process management. The common thread is that these systems manage recurring operational work for the enterprise rather than customer-facing or industry-specific workflows.",
+                          "expandedDefinition": "A subsegment of Enterprise Resource Planning Applications focused on managing internal operational and administrative workflows outside core finance, HR, or customer-facing processes. Products in this segment commonly support facilities operations, internal services, operational coordination, administrative process management, workflow approvals, and enterprise operational execution.\r\n\r\nThis is the catch-all back-office operations layer for recurring internal work that does not fit cleanly into a more specialized ERP subsegment. The key boundary is that the product owns an internal operating workflow rather than a customer-facing, finance, HR, or procurement-specific process."
+                        }
+                      ],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Integrated systems of record used to manage core enterprise administrative and operational processes across finance, procurement, workforce, assets, and internal operations. ERP applications standardize transactional workflows, enforce controls, and centralize operational data so that the enterprise can plan, execute, and report across core back-office functions.",
+                      "expandedDefinition": "Integrated systems of record used to manage core enterprise administrative and operational processes across finance, procurement, workforce, assets, and internal operations. ERP applications standardize transactional workflows, enforce controls, and centralize operational data so that the enterprise can plan, execute, and report across core back-office functions.\r\n\r\nThe defining feature of ERP is that it serves as the system of record for enterprise processes rather than as a point solution for a single workflow. Markets within ERP tend to be defined by the back-office function they own, which is why finance, HR, procurement, asset management, and internal operations are separated as distinct subsegments in the taxonomy."
+                    },
+                    {
+                      "id": "horizontal-tech-software-applications-ai-native-applications",
+                      "level": "L4",
+                      "name": "AI-native Applications",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Applications",
+                        "AI-native Applications"
+                      ],
+                      "children": [
+                        {
+                          "id": "horizontal-tech-software-applications-ai-native-applications-genai-applications",
+                          "level": "L5",
+                          "name": "GenAI Applications",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "AI-native Applications",
+                            "GenAI Applications"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of AI-native Applications focused on generating, transforming, or summarizing content such as text, code, images, audio, video, or structured knowledge outputs. Products in this market are typically used for drafting, copiloting, summarization, creative generation, conversational interfaces, and search augmentation, and are purchased primarily for their generative capabilities.",
+                          "expandedDefinition": "A subsegment of AI-native Applications focused on generating, transforming, summarizing, or synthesizing content through generative AI models. Products in this market are designed primarily to create outputs — such as text, code, images, audio, video, presentations, designs, or structured knowledge artifacts — in response to user prompts, contextual inputs, or embedded workflows.\r\n\r\nCore capabilities typically include conversational interfaces, text generation, code generation, summarization, content drafting, image and media generation, semantic search, retrieval-augmented generation (RAG), copilots, prompt engineering workflows, and contextual knowledge synthesis. Many platforms also support collaborative editing, multimodal generation, personalization, workflow augmentation, and integration into productivity or business applications.\r\n\r\nThe defining characteristic of GenAI Applications is that the primary value delivered by the product is generative output creation and knowledge synthesis. These applications are optimized around helping users produce, refine, or interact with content more efficiently through AI-generated responses and creative assistance.\r\n\r\nThis segment is distinct from:\r\n\r\nAI Agent Applications, which are optimized for autonomous task execution and workflow orchestration rather than primarily generating content\r\nAnalytics and Business Intelligence Software, which focuses on structured analysis and reporting rather than generative interaction\r\nApplication Development and Testing Software, which supports broader engineering workflows rather than AI-native content generation experiences\r\n\r\nProducts in this segment are typically purchased by knowledge workers, developers, creative professionals, enterprises, and consumers seeking productivity enhancement, content creation, research assistance, or conversational AI experiences. Competitive differentiation is often driven by output quality, reasoning capability, contextual awareness, multimodal support, workflow integration, personalization, and model performance."
+                        },
+                        {
+                          "id": "horizontal-tech-software-applications-ai-native-applications-ai-agent-applications",
+                          "level": "L5",
+                          "name": "AI Agent Applications",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Applications",
+                            "AI-native Applications",
+                            "AI Agent Applications"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of AI-native Applications focused on autonomous or semi-autonomous task execution. Products in this market use reasoning, planning, memory, and tool use to carry out multi-step workflows, interact with software systems, and perform actions on behalf of users with limited manual intervention.",
+                          "expandedDefinition": "A subsegment of AI-native Applications focused on autonomous or semi-autonomous task execution, workflow coordination, and operational decision-making through AI-driven agents. Products in this market are designed primarily to perform actions, complete workflows, interact with software systems, and execute multi-step tasks on behalf of users with limited manual intervention.\r\n\r\nCore capabilities typically include reasoning and planning engines, memory management, workflow orchestration, software tool use, API interaction, autonomous task execution, agent collaboration, event-driven automation, contextual decision-making, and persistent operational state management. Many platforms also support multi-agent coordination, browser or application control, human-in-the-loop workflows, task delegation, and dynamic workflow adaptation.\r\n\r\nThe defining characteristic of AI Agent Applications is that the primary value delivered by the product is autonomous execution and operational workflow completion rather than content generation itself. While these products may generate text or conversational responses as part of the interaction model, generation serves the broader goal of completing actions and coordinating workflows across systems and environments.\r\n\r\nThis segment is distinct from:\r\n\r\nGenAI Applications, which are optimized primarily around content generation, summarization, and creative or knowledge outputs\r\nIntegration and Orchestration Middleware, which coordinates system workflows deterministically rather than through AI-driven reasoning and autonomous execution\r\nProductivity Applications, which facilitate human collaboration and workflow management but do not autonomously execute tasks on behalf of users\r\n\r\nProducts in this segment are typically purchased by enterprises, operations teams, developers, and individual users seeking workflow automation, task delegation, operational augmentation, or autonomous digital labor capabilities. Competitive differentiation is often driven by reasoning sophistication, reliability of task execution, integration breadth, autonomy level, memory and context persistence, orchestration capability, and the ability to safely operate across complex real-world workflows and software environments."
+                        }
+                      ],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Applications in which AI capability is central to the user experience and the primary reason the product is purchased, rather than an embedded feature layered into a broader application. This category includes software that uses generative or agentic AI to perform tasks, create outputs, or change how users interact with the product at the core workflow level.",
+                      "expandedDefinition": "Applications in which AI capability is central to the user experience and the primary reason the product is purchased, rather than an embedded feature layered into a broader application. This category includes software that uses generative or agentic AI to perform tasks, create outputs, or change how users interact with the product at the core workflow level.\r\n\r\nThe boundary is that AI is not just an add-on or supporting feature; it is the product’s main value proposition and organizing principle. Buyers typically evaluate these applications based on output quality, workflow automation, task completion, and how much they change the user’s working model compared with conventional software."
+                    },
+                    {
+                      "id": "horizontal-tech-software-applications-supply-chain-management-scm-applications",
+                      "level": "L4",
+                      "name": "Supply Chain Management (SCM) Applications",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Applications",
+                        "Supply Chain Management (SCM) Applications"
+                      ],
+                      "children": [],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Applications used to plan, coordinate, execute, and optimize the movement of goods, inventory, materials, suppliers, and logistics operations across supply chain networks. These products support sourcing, demand planning, inventory optimization, transportation, warehousing, fulfillment, and supply chain visibility, and they are typically used by supply chain, logistics, and operations teams.",
+                      "expandedDefinition": "Applications used to plan, coordinate, execute, and optimize the movement of goods, inventory, materials, suppliers, and logistics operations across supply chain networks. These products support sourcing, demand planning, inventory optimization, transportation, warehousing, fulfillment, and supply chain visibility, and they are typically used by supply chain, logistics, and operations teams.\r\n\r\nThe market is defined by its control over physical flow and planning across distributed partners, facilities, and transportation nodes. It is distinct from commerce applications because it focuses on the movement and availability of goods after demand has been created, rather than on the customer-facing commerce transaction itself."
+                    }
+                  ],
+                  "isHorizontal": true,
+                  "additiveToSoftwareMarket": true,
+                  "definition": "End-user-facing software used to support business, operational, analytical, collaborative, financial, customer-facing, and industry-specific workflows. This layer includes software that owns a user workflow or business process directly, rather than providing underlying infrastructure, developer tooling, or system connectivity.",
+                  "expandedDefinition": "End-user-facing software used to support business, operational, analytical, collaborative, financial, customer-facing, and industry-specific workflows. This layer includes products that own a user workflow or business process directly, rather than providing underlying infrastructure, developer tooling, or system connectivity.\r\n\r\nApplications are typically evaluated on how well they help employees or external users complete a task, coordinate a process, make a decision, or transact with a business. Within the taxonomy, this layer is split into horizontal application families and vertical industry applications. The distinction matters because application markets usually compete on user experience, process depth, domain fit, and business workflow ownership rather than on underlying technical infrastructure."
+                },
+                {
+                  "id": "horizontal-tech-software-infrastructure-software",
+                  "level": "L3",
+                  "name": "Infrastructure Software",
+                  "path": [
+                    "Horizontal",
+                    "Tech",
+                    "Software",
+                    "Infrastructure Software"
+                  ],
+                  "children": [
+                    {
+                      "id": "horizontal-tech-software-infrastructure-software-computing-and-storage-software",
+                      "level": "L4",
+                      "name": "Computing and Storage Software",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Infrastructure Software",
+                        "Computing and Storage Software"
+                      ],
+                      "children": [],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Infrastructure software used to provision, virtualize, orchestrate, and manage compute resources, storage environments, cloud workloads, containers, and operating environments. This market underpins the runtime layer of digital systems and is typically purchased to improve resource efficiency, scalability, resilience, and workload portability.",
+                      "expandedDefinition": "Infrastructure software used to provision, virtualize, orchestrate, and manage compute resources, storage environments, cloud workloads, containers, and operating environments. This market underpins the runtime layer of digital systems and is typically purchased to improve resource efficiency, scalability, resilience, and workload portability.\r\n\r\nThese products are used to allocate and control the technical resources on which applications depend, including virtual machines, containers, file systems, object storage, and cloud infrastructure control planes. The defining boundary is that this segment owns the compute and storage substrate rather than the application, network, or security policy layer."
+                    },
+                    {
+                      "id": "horizontal-tech-software-infrastructure-software-security-software",
+                      "level": "L4",
+                      "name": "Security Software",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Infrastructure Software",
+                        "Security Software"
+                      ],
+                      "children": [
+                        {
+                          "id": "horizontal-tech-software-infrastructure-software-security-software-grc-software",
+                          "level": "L5",
+                          "name": "GRC Software",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Infrastructure Software",
+                            "Security Software",
+                            "GRC Software"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of Security Software focused on governance, risk, and compliance management across enterprise policies, controls, audits, and regulatory obligations. Products in this market are used to document control environments, collect evidence, assess risk, manage policy workflows, and demonstrate compliance to internal and external stakeholders.",
+                          "expandedDefinition": "A subsegment of Security Software focused on governance, risk, and compliance management across enterprise policies, controls, audits, and regulatory obligations. Products in this market are used to document control environments, collect evidence, assess risk, manage policy workflows, and demonstrate compliance to internal and external stakeholders.\r\n\r\nThe market exists to make governance and compliance operational rather than manual. Buyers typically include risk, compliance, internal audit, legal, and security governance teams that need a structured record of policies, controls, issues, and remediation activity."
+                        },
+                        {
+                          "id": "horizontal-tech-software-infrastructure-software-security-software-iam-software",
+                          "level": "L5",
+                          "name": "IAM Software",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Infrastructure Software",
+                            "Security Software",
+                            "IAM Software"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "A subsegment of Security Software focused on authenticating users, governing permissions, and controlling access to enterprise systems and data. Core capabilities typically include single sign-on, multi-factor authentication, identity governance, privileged access management, directory services, user provisioning, and access lifecycle management.",
+                          "expandedDefinition": "A subsegment of Security Software focused on authenticating users, governing permissions, and controlling access to enterprise systems and data. Core capabilities typically include single sign-on, multi-factor authentication, identity governance, privileged access management, directory services, user provisioning, and access lifecycle management.\r\n\r\nThis market owns the identity layer of security: who the user is, what they can access, and how that access is granted, revoked, and audited. It is distinct from endpoint and data security because the primary object of control is the identity rather than the device or the data itself."
+                        },
+                        {
+                          "id": "horizontal-tech-software-infrastructure-software-security-software-security-operations-siem-soar-xdr",
+                          "level": "L5",
+                          "name": "Security Operations (SIEM/SOAR/XDR)",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Infrastructure Software",
+                            "Security Software",
+                            "Security Operations (SIEM/SOAR/XDR)"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "Software used by security operations teams to detect, investigate, correlate, and respond to cyber threats across an organization. SIEM products aggregate and analyze logs and events; SOAR products automate response playbooks and incident workflows; XDR products unify threat detection and response across endpoints, identities, networks, and cloud assets. This category is defined by operational threat detection and response, not by access control, governance, or point security controls alone.",
+                          "expandedDefinition": "A subsegment of Security Software focused on detecting, investigating, coordinating, and responding to cybersecurity threats across enterprise environments. The primary object managed and protected by this segment is the organization’s overall security posture and operational threat environment rather than any single asset type such as endpoints, identities, or data.\r\n\r\nProducts in this market aggregate and analyze telemetry from across the enterprise — including endpoints, networks, cloud systems, applications, identities, and security tools — in order to identify suspicious activity, correlate events, prioritize incidents, and orchestrate response actions. Core capabilities typically include security event collection, log aggregation, threat detection, behavioral analytics, incident investigation, alert correlation, response automation, case management, threat intelligence integration, and security workflow orchestration.\r\n\r\nThe defining characteristic of Security Operations software is that it functions as the centralized operational command layer for cybersecurity teams. These platforms are optimized around visibility, detection, investigation, and coordinated response across the broader enterprise attack surface rather than directly enforcing protection on a specific resource type.\r\n\r\nThis segment is distinct from:\r\n\r\nData Security, where the primary object of protection is sensitive enterprise data\r\nEndpoint Security, where the primary object of protection is endpoint devices such as laptops, servers, and mobile devices\r\nIAM Software, where the primary object of control is user identity and access permissions\r\n\r\nProducts in this segment are typically purchased by security operations centers (SOCs), incident response teams, security engineering organizations, and enterprise cybersecurity functions. Competitive differentiation is often driven by detection quality, telemetry breadth, automation sophistication, threat correlation, investigation workflows, and response orchestration capabilities."
+                        },
+                        {
+                          "id": "horizontal-tech-software-infrastructure-software-security-software-data-security",
+                          "level": "L5",
+                          "name": "Data Security",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Infrastructure Software",
+                            "Security Software",
+                            "Data Security"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "Software used to protect enterprise data itself, regardless of where it resides or how it is accessed. This includes data loss prevention, data discovery and classification, encryption, tokenization, rights management, access monitoring, and sensitive data governance. The defining distinction is that the software’s primary object of protection is the data asset, rather than the endpoint, identity, or network perimeter.",
+                          "expandedDefinition": "A subsegment of Security Software focused on protecting sensitive enterprise data regardless of where the data resides, how it moves, or which users, applications, or systems access it. The primary object of protection in this segment is the data asset itself.\r\n\r\nProducts in this market are designed to secure structured and unstructured data across databases, cloud platforms, SaaS applications, endpoints, file systems, collaboration tools, and data pipelines. Core capabilities typically include data classification, encryption, tokenization, key management, data loss prevention (DLP), rights management, access monitoring, data discovery, retention policy enforcement, and sensitive data governance. Many platforms also support insider risk monitoring, data activity auditing, compliance reporting, and AI-driven data risk detection.\r\n\r\nThe defining characteristic of Data Security software is that protection policies persist with the data itself rather than being tied primarily to a device, network boundary, or identity layer. These products are optimized around controlling data access, preventing leakage or misuse, and maintaining visibility into how sensitive information is stored, shared, and consumed across distributed environments.\r\n\r\nThis segment is distinct from:\r\n\r\nEndpoint Security, which protects the endpoint device as the primary security surface\r\nSecurity Operations Software, which manages centralized threat detection and incident response workflows\r\nIAM Software, which governs user authentication and access privileges rather than the data asset itself\r\n\r\nProducts in this segment are typically purchased by security, compliance, governance, and data protection teams. Competitive differentiation is often driven by classification accuracy, policy granularity, cross-environment visibility, encryption architecture, compliance support, and the ability to secure sensitive data across increasingly distributed cloud and SaaS ecosystems."
+                        },
+                        {
+                          "id": "horizontal-tech-software-infrastructure-software-security-software-endpoint-security",
+                          "level": "L5",
+                          "name": "Endpoint Security",
+                          "path": [
+                            "Horizontal",
+                            "Tech",
+                            "Software",
+                            "Infrastructure Software",
+                            "Security Software",
+                            "Endpoint Security"
+                          ],
+                          "children": [],
+                          "isHorizontal": true,
+                          "additiveToSoftwareMarket": true,
+                          "definition": "Software used to protect laptops, desktops, servers, mobile devices, and other endpoints from malware, ransomware, unauthorized access, and compromise. Typical capabilities include antivirus, endpoint detection and response, endpoint management, device control, threat isolation, behavioral analysis, and device posture enforcement. This category is distinct because the endpoint device is the primary security surface, even though the product may integrate with broader security operations platforms.",
+                          "expandedDefinition": "A subsegment of Security Software focused on protecting endpoint devices — including laptops, desktops, servers, virtual machines, mobile devices, and workstations — from compromise, malware, unauthorized access, and malicious activity. The primary object of protection in this segment is the endpoint device itself and the runtime environment operating on that device.\r\n\r\nProducts in this market are designed to secure devices where users interact directly with enterprise systems and where attacks commonly originate or execute. Core capabilities typically include antivirus and anti-malware protection, endpoint detection and response (EDR), behavioral monitoring, threat isolation, device control, vulnerability management, patch management, endpoint compliance enforcement, ransomware protection, and remediation workflows. Many platforms also support zero-trust endpoint controls, mobile device security, and cloud-delivered endpoint telemetry analysis.\r\n\r\nThe defining characteristic of Endpoint Security software is that it enforces security controls directly on the endpoint runtime environment in order to prevent, detect, contain, and remediate device-level compromise. These products are optimized around protecting the integrity, behavior, and operational state of endpoint systems used by employees, workloads, or enterprise infrastructure.\r\n\r\nThis segment is distinct from:\r\n\r\nData Security, which protects the information asset itself regardless of where it resides\r\nSecurity Operations Software, which provides centralized monitoring, investigation, and response coordination across the enterprise\r\nNetworking Software or Network Security products, which protect traffic flows and connectivity layers rather than endpoint devices directly\r\n\r\nProducts in this segment are typically purchased by endpoint management teams, security operations organizations, IT infrastructure teams, and enterprise cybersecurity groups. Competitive differentiation is often driven by detection efficacy, response speed, behavioral analytics, device visibility, lightweight deployment, automation, and integration with broader enterprise security ecosystems."
+                        }
+                      ],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Software designed to prevent, detect, investigate, govern, and remediate cyber threats while protecting enterprise users, devices, applications, identities, networks, and data. This umbrella category includes the products that implement security controls, manage security operations, and reduce cyber risk across the enterprise stack.",
+                      "expandedDefinition": "Software designed to prevent, detect, investigate, govern, and remediate cyber threats while protecting enterprise users, devices, applications, identities, networks, and data. This umbrella category includes the products that implement security controls, manage security operations, and reduce cyber risk across the enterprise stack.\r\n\r\nThe market spans prevention, detection, response, governance, and data protection, which is why its subsegments are separated by the security surface or workflow they own. Buyers typically include CISO organizations, SOC teams, identity teams, compliance teams, and platform security groups that need layered controls across a modern enterprise environment."
+                    },
+                    {
+                      "id": "horizontal-tech-software-infrastructure-software-it-operations-management-software",
+                      "level": "L4",
+                      "name": "IT Operations Management Software",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Infrastructure Software",
+                        "IT Operations Management Software"
+                      ],
+                      "children": [],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Software used by IT operations teams to monitor infrastructure and applications, manage incidents and service requests, automate operational workflows, and maintain uptime, reliability, and performance across enterprise environments. The market includes observability, IT service management, AIOps, configuration management, and operations automation tooling.",
+                      "expandedDefinition": "Software used by IT operations teams to monitor infrastructure and applications, manage incidents and service requests, automate operational workflows, and maintain uptime, reliability, and performance across enterprise environments. The market includes observability, IT service management, AIOps, configuration management, and operations automation tooling.\r\n\r\nThese products are typically bought to give IT teams visibility and control over the production environment and the service layer that supports internal and external users. The boundary is that ITOM manages the operational health of technology services rather than the development of software or the security governance around it."
+                    },
+                    {
+                      "id": "horizontal-tech-software-infrastructure-software-networking-software",
+                      "level": "L4",
+                      "name": "Networking Software",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Infrastructure Software",
+                        "Networking Software"
+                      ],
+                      "children": [],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Software used to configure, manage, optimize, and secure network connectivity across enterprise, cloud, and edge environments. This includes tools for routing, switching, WAN/LAN management, software-defined networking, load balancing, DNS, network visibility, traffic engineering, and network policy enforcement. In the market, this category sits at the infrastructure layer and is typically bought by network engineering, infrastructure, and cloud operations teams.",
+                      "expandedDefinition": "A subsegment of Infrastructure Software focused on managing, optimizing, securing, and orchestrating enterprise network connectivity across cloud, on-premise, hybrid, and edge environments. Products in this market are used by network engineering and infrastructure teams to administer routing, switching, software-defined networking, traffic management, DNS, WAN optimization, network observability, and connectivity policies.\r\n\r\nThis segment owns the communication fabric between systems, users, and devices. Buyers evaluate these products on uptime, throughput, policy control, automation, visibility, and the ability to support increasingly distributed and software-defined network architectures."
+                    },
+                    {
+                      "id": "horizontal-tech-software-infrastructure-software-database-infrastructure",
+                      "level": "L4",
+                      "name": "Database Infrastructure",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Infrastructure Software",
+                        "Database Infrastructure"
+                      ],
+                      "children": [],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Foundational software that stores, organizes, processes, and serves structured data for applications and analytics. This includes relational and non-relational databases, distributed databases, database engines, database-as-a-service platforms, replication tools, query optimization layers, and related administration software. The defining characteristic is that the product is the underlying data store or database runtime, not the analytics or application layer built on top of it.",
+                      "expandedDefinition": "Software used to store, organize, process, index, and retrieve structured, semi-structured, or unstructured data for operational applications and analytical systems. Database Infrastructure serves as the foundational runtime data layer of the software stack, providing the persistent storage engines and query systems on which applications and data environments depend.\r\n\r\nProducts in this market include relational databases, NoSQL databases, distributed databases, graph databases, time-series databases, in-memory databases, transactional databases, and database management systems. Core capabilities typically include query execution, indexing, transaction management, concurrency control, replication, clustering, high availability, scaling, backup support, storage optimization, and runtime performance management.\r\n\r\nThe defining characteristic of Database Infrastructure is that the software functions as the primary operational system for storing and serving data in production environments. Applications interact directly with these systems to read, write, and update data in real time. The category is centered on persistence, query execution, reliability, and runtime performance of the data store itself.\r\n\r\nDatabase Infrastructure is distinct from:\r\n\r\nData Management Software, which governs, transforms, integrates, orchestrates, and operationalizes data across systems rather than acting as the runtime database engine\r\nBackup and Recovery Software, which focuses on resilience and restoration rather than operational query and transaction processing\r\nAnalytics and Business Intelligence Software, which sits at the reporting and analytical consumption layer above the database environment\r\n\r\nProducts in this segment are typically purchased by infrastructure teams, platform engineering organizations, database administrators, and application engineering teams. Competitive differentiation is often driven by scalability, latency, consistency models, availability, workload performance, cloud-native architecture, multi-region support, and operational efficiency under production workloads."
+                    },
+                    {
+                      "id": "horizontal-tech-software-infrastructure-software-backup-and-recovery-software",
+                      "level": "L4",
+                      "name": "Backup and Recovery Software",
+                      "path": [
+                        "Horizontal",
+                        "Tech",
+                        "Software",
+                        "Infrastructure Software",
+                        "Backup and Recovery Software"
+                      ],
+                      "children": [],
+                      "isHorizontal": true,
+                      "additiveToSoftwareMarket": true,
+                      "definition": "Software used to protect enterprise data and systems by creating backup copies, enabling restoration, and supporting disaster recovery after outage, corruption, ransomware, or accidental deletion. Typical capabilities include snapshot management, backup orchestration, replication, retention policies, restore workflows, disaster recovery automation, and recovery testing. This category is defined by data preservation and restoration, rather than day-to-day storage administration.",
+                      "expandedDefinition": "A subsegment of Infrastructure Software focused on protecting enterprise data and systems through backup, replication, disaster recovery, and restoration workflows. These products are designed to ensure data resilience and operational continuity following outages, corruption, ransomware attacks, accidental deletion, or infrastructure failures, and they typically provide backup orchestration, snapshots, retention policies, recovery automation, and failover management.\r\n\r\nThe market exists to make sure critical workloads can be restored quickly and with minimal data loss. Buyers usually care about recovery point objectives, recovery time objectives, immutability, ransomware resilience, testability, and whether the software can support hybrid and multi-cloud recovery architectures."
+                    }
+                  ],
+                  "isHorizontal": true,
+                  "additiveToSoftwareMarket": true,
+                  "definition": "Foundational software layers that provision, secure, monitor, connect, store, and optimize the technical environments on which applications run. Infrastructure software is typically purchased by IT, security, cloud, and platform teams to improve runtime reliability, scalability, observability, resilience, and operational control.",
+                  "expandedDefinition": "Foundational software layers that provision, secure, monitor, connect, store, and optimize the technical environments on which applications run. Infrastructure software is typically purchased by IT, security, cloud, and platform teams to improve reliability, scalability, observability, resilience, and operational control.\r\n\r\nThese products are not the business application itself; they are the enabling stack underneath it. The market includes compute and storage, networking, databases, backup and recovery, IT operations, security, and related control-plane capabilities. Competitive differentiation usually comes from performance, automation, fault tolerance, integration depth, and how well the software supports hybrid and distributed environments."
+                }
+              ],
+              "isHorizontal": true,
+              "additiveToSoftwareMarket": true,
+              "definition": "Commercial and internally developed digital products that process information, automate workflows, manage infrastructure, enable transactions, support decision-making, or facilitate digital interactions across consumers, enterprises, and public institutions. This umbrella market includes both horizontal software used across industries and vertical software built for specialized operational environments.",
+              "expandedDefinition": "Commercial and internally developed digital products that process information, automate workflows, manage infrastructure, enable transactions, support decision-making, or facilitate digital interactions across consumers, enterprises, and public institutions. This umbrella market spans both horizontal software used across industries and vertical software built for specialized operating environments, but it excludes hardware and pure professional services.\r\n\r\nAt the top of the taxonomy, this category is intentionally broad: it captures software as a product class rather than a use case or an industry. The practical boundary is that the offering must be a repeatable software product, platform, or subscription service that can be sold, licensed, or deployed independently of custom implementation work. Software products are differentiated by the workflow they own, the users they serve, and whether they operate as a system of record, system of engagement, control plane, or infrastructure layer."
+            }
+          ],
+          "isHorizontal": true,
+          "additiveToSoftwareMarket": false
+        }
+      ],
+      "isHorizontal": true,
+      "additiveToSoftwareMarket": false
+    },
+    {
+      "id": "vertical",
+      "level": "L0",
+      "name": "Vertical",
+      "path": [
+        "Vertical"
+      ],
+      "children": [
+        {
+          "id": "vertical-tech",
+          "level": "L1",
+          "name": "Tech",
+          "path": [
+            "Vertical",
+            "Tech"
+          ],
+          "children": [
+            {
+              "id": "vertical-tech-software",
+              "level": "L2",
+              "name": "Software",
+              "path": [
+                "Vertical",
+                "Tech",
+                "Software"
+              ],
+              "children": [
+                {
+                  "id": "vertical-tech-software-insurance",
+                  "level": "L3",
+                  "name": "Insurance",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Insurance"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "A vertical-specific software market designed for insurers, brokers, MGAs, reinsurers, and claims organizations to manage underwriting, policy administration, claims processing, actuarial workflows, billing, and insurance compliance. The market is defined by policy- and claims-centric workflows, risk underwriting logic, regulatory requirements, and deep integration into the insurance operating model.",
+                  "expandedDefinition": "A vertical-specific software market designed for insurers, brokers, MGAs, reinsurers, and claims organizations to manage underwriting, policy administration, claims processing, actuarial workflows, billing, and insurance compliance. The market is defined by policy- and claims-centric workflows, risk underwriting logic, regulatory requirements, and deep integration into the insurance operating model.\r\n\r\nThese products sit close to the core operating systems of carriers and intermediaries, where policy lifecycle management, claims adjudication, and customer service must be aligned to regulatory and financial controls. Buyers typically value configurable policy logic, claims automation, product flexibility, and support for multiple distribution and line-of-business models."
+                },
+                {
+                  "id": "vertical-tech-software-finance",
+                  "level": "L3",
+                  "name": "Finance",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Finance"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "A vertical-specific software market designed for banks, lenders, capital markets firms, payments providers, wealth managers, and other financial institutions to support core financial operations. Products in this market typically address lending, payments, trading, portfolio management, treasury, risk, fraud, and financial compliance workflows that are unique to regulated financial-services environments.",
+                  "expandedDefinition": "A vertical-specific software market designed for banks, lenders, capital markets firms, payments providers, wealth managers, and other financial institutions to support core financial operations. Products in this market typically address lending, payments, trading, portfolio management, treasury, risk, fraud, and financial compliance workflows that are unique to regulated financial-services environments.\r\n\r\nThe market is shaped by regulatory oversight, transactional volume, security expectations, and the need to operate at scale with high reliability. Buyers often evaluate products on integration with financial rails, risk controls, compliance features, and their ability to support institution-specific operating models."
+                },
+                {
+                  "id": "vertical-tech-software-government-and-defense",
+                  "level": "L3",
+                  "name": "Government and Defense",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Government and Defense"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "A vertical-specific software market designed for public sector agencies and defense organizations that need to manage citizen services, mission operations, case management, procurement, intelligence, and secure communications. The market is characterized by highly regulated workflows, procurement constraints, security requirements, and mission-critical operational environments.",
+                  "expandedDefinition": "A vertical-specific software market designed for public sector agencies and defense organizations that need to manage citizen services, mission operations, case management, procurement, intelligence, and secure communications. The market is characterized by highly regulated workflows, procurement constraints, security requirements, and mission-critical operational environments.\r\n\r\nThese products must often operate within strict policy, data, and procurement frameworks, while supporting long lifecycle deployments and high trust requirements. Buyers care about security, auditability, configurability, and the ability to support public-sector or defense-specific operational needs."
+                },
+                {
+                  "id": "vertical-tech-software-healthcare",
+                  "level": "L3",
+                  "name": "Healthcare",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Healthcare"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "A vertical-specific software market designed for providers, payers, laboratories, pharmaceutical companies, biotechnology firms, and other healthcare organizations to manage clinical, operational, financial, and regulatory workflows. Products in this market commonly support care delivery, patient administration, claims, revenue cycle management, clinical documentation, lab operations, and healthcare-specific compliance.",
+                  "expandedDefinition": "A vertical-specific software market designed for providers, payers, laboratories, pharmaceutical companies, biotechnology firms, and other healthcare organizations to manage clinical, operational, financial, and regulatory workflows. Products in this market commonly support care delivery, patient administration, claims, revenue cycle management, clinical documentation, lab operations, and healthcare-specific compliance.\r\n\r\nThe segment is defined by regulated workflows, sensitive patient data, and tight integration into clinical and administrative processes. Buyers evaluate software on clinical fit, interoperability, compliance, workflow efficiency, and the ability to support provider, payer, and life sciences operating environments."
+                },
+                {
+                  "id": "vertical-tech-software-manufacturing-and-engineering",
+                  "level": "L3",
+                  "name": "Manufacturing and Engineering",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Manufacturing and Engineering"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "A vertical-specific software market designed for manufacturers, industrial firms, and engineering organizations to manage design, production, quality, maintenance, and plant operations. Products in this market typically support engineering design, product lifecycle management, manufacturing execution, shop-floor coordination, process control, quality management, and industrial optimization.",
+                  "expandedDefinition": "A vertical-specific software market designed for manufacturers, industrial firms, and engineering organizations to manage design, production, quality, maintenance, and plant operations. Products in this market typically support engineering design, product lifecycle management, manufacturing execution, shop-floor coordination, process control, quality management, and industrial optimization.\r\n\r\nThe market sits at the intersection of digital design and physical production, where software must connect engineering intent to plant-level execution. Buyers often value traceability, production visibility, integration with industrial systems, and the ability to improve throughput, quality, and operational reliability."
+                },
+                {
+                  "id": "vertical-tech-software-construction",
+                  "level": "L3",
+                  "name": "Construction",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Construction"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "Vertical-specific software used by construction organizations to manage project execution, field coordination, and construction financial control.",
+                  "expandedDefinition": "Vertical-specific software designed for construction firms, general contractors, subcontractors, developers, infrastructure operators, and construction project stakeholders to manage the planning, execution, coordination, and financial control of construction projects and built assets. Products in this market are tailored to the operational workflows, project-based economics, regulatory requirements, and field coordination needs unique to the construction industry.\r\n\r\nCore capabilities typically include project management, scheduling, budgeting, cost estimation, bid management, procurement coordination, subcontractor management, change order management, field operations, document control, RFIs, punch lists, safety and compliance workflows, construction accounting, and project collaboration. Many platforms also support Building Information Modeling (BIM), site inspections, equipment tracking, workforce coordination, progress reporting, and mobile field productivity workflows.\r\n\r\nThe defining characteristic of construction software is that it manages highly fragmented, project-centric operational workflows that coordinate labor, materials, contractors, equipment, timelines, and budgets across dynamic physical job sites. Unlike horizontal ERP or project management software, construction software is purpose-built around the realities of construction execution, including field operations, phased project delivery, subcontractor ecosystems, regulatory inspections, and project-based financial management.\r\n\r\nThis market commonly includes:\r\n\r\nConstruction project management platforms\r\nConstruction ERP systems\r\nBIM and construction design coordination tools\r\nEstimation and bidding software\r\nField service and site management applications\r\nConstruction accounting and job costing systems\r\nWorkforce and subcontractor coordination platforms\r\nInfrastructure and capital project management systems\r\n\r\nConstruction software is distinct from:\r\n\r\nHorizontal project management software, which lacks construction-specific workflows such as RFIs, change orders, and job costing\r\nManufacturing and industrial software, which focuses on repeatable production environments rather than project-based physical construction execution\r\nEngineering design software, when used purely for technical design without construction execution workflows\r\nReal estate software, which focuses on property operations, leasing, and asset management rather than construction delivery\r\n\r\nProducts in this segment are typically purchased by general contractors, specialty contractors, engineering and construction firms, infrastructure developers, owners/operators, and capital project organizations. Competitive differentiation is often driven by field usability, workflow integration across office and jobsite environments, project financial controls, BIM interoperability, subcontractor coordination, mobile functionality, and the ability to manage highly complex multi-party construction operations."
+                },
+                {
+                  "id": "vertical-tech-software-retail-wholesale",
+                  "level": "L3",
+                  "name": "Retail & Wholesale",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Retail & Wholesale"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "A vertical-specific software market designed for retailers, wholesalers, distributors, and commerce operators to manage merchandising, inventory, pricing, orders, channels, and customer experience across physical and digital environments. Products in this market commonly support point of sale, promotion management, order orchestration, fulfillment coordination, supplier collaboration, and retail analytics.",
+                  "expandedDefinition": "A vertical-specific software market designed for retailers, wholesalers, distributors, and commerce operators to manage merchandising, inventory, pricing, orders, channels, and customer experience across physical and digital environments. Products in this market commonly support point of sale, promotion management, order orchestration, fulfillment coordination, supplier collaboration, and retail analytics.\r\n\r\nThe market is defined by high-volume transaction workflows, inventory visibility, channel coordination, and the need to serve both consumer and business buyers. Buyers care about omnichannel execution, merchandising control, operational efficiency, and the ability to connect store, warehouse, and digital commerce operations."
+                },
+                {
+                  "id": "vertical-tech-software-transportation-logistics",
+                  "level": "L3",
+                  "name": "Transportation & Logistics",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Transportation & Logistics"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "A vertical-specific software market designed for logistics operators, transportation providers, freight companies, fleet operators, and shipping organizations to manage routing, dispatch, fleet operations, warehouse coordination, and shipment visibility. The market is characterized by execution-heavy workflows tied to physical movement, scheduling, capacity optimization, and network-wide operational coordination.",
+                  "expandedDefinition": "A vertical-specific software market designed for logistics operators, transportation providers, freight companies, fleet operators, and shipping organizations to manage routing, dispatch, fleet operations, warehouse coordination, and shipment visibility. The market is characterized by execution-heavy workflows tied to physical movement, scheduling, capacity optimization, and network-wide operational coordination.\r\n\r\nProducts in this market help operators plan and execute the movement of goods and vehicles across complex networks. Buyers usually evaluate them on route optimization, asset visibility, capacity utilization, dispatch efficiency, and the ability to coordinate across warehouses, fleets, carriers, and customers."
+                },
+                {
+                  "id": "vertical-tech-software-utilities",
+                  "level": "L3",
+                  "name": "Utilities",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Utilities"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "A vertical-specific software market designed for electric, gas, water, renewable energy, and utility operators to manage grid operations, outage response, metering, field service, asset operations, and regulatory reporting. Products in this market are built around reliability, infrastructure continuity, service delivery, and compliance-heavy operational environments.",
+                  "expandedDefinition": "A vertical-specific software market designed for electric, gas, water, renewable energy, and utility operators to manage grid operations, outage response, metering, field service, asset operations, and regulatory reporting. Products in this market are built around reliability, infrastructure continuity, service delivery, and compliance-heavy operational environments.\r\n\r\nThe market is shaped by asset-intensive operations, field coordination, and the need to maintain essential services under strict regulatory and service-level expectations. Buyers typically value real-time visibility, outage and work management, asset optimization, and support for complex utility operating models."
+                },
+                {
+                  "id": "vertical-tech-software-communications",
+                  "level": "L3",
+                  "name": "Communications",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Communications"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "A vertical-specific software market designed for telecommunications carriers and communications service providers to manage subscriber operations, network provisioning, billing, OSS/BSS workflows, and service assurance. These products are shaped by the scale, uptime, and provisioning requirements of network-centric communications businesses.",
+                  "expandedDefinition": "A vertical-specific software market designed for telecommunications carriers and communications service providers to manage subscriber operations, network provisioning, billing, OSS/BSS workflows, and service assurance. These products are shaped by the scale, uptime, and provisioning requirements of network-centric communications businesses.\r\n\r\nThe market is anchored in recurring subscriber relationships, network service delivery, and high-volume operational processes. Buyers typically evaluate these products on scale, reliability, billing integration, provisioning speed, and their ability to support telecom operating environments."
+                },
+                {
+                  "id": "vertical-tech-software-media",
+                  "level": "L3",
+                  "name": "Media",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Media"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "Industry-specific software designed for media, publishing, broadcasting, streaming, gaming, and entertainment organizations to manage the creation, packaging, distribution, monetization, and performance of digital or physical content. Products in this category typically support workflows such as content production, digital asset management, publishing operations, ad sales and monetization, audience analytics, streaming delivery, rights management, subscriber management, and media operations orchestration. Unlike horizontal content or collaboration software, media vertical software is tailored to the operational economics, distribution models, audience measurement systems, and rights-driven workflows specific to media and entertainment businesses.",
+                  "expandedDefinition": "A vertical-specific software market designed for media, publishing, broadcasting, streaming, gaming, and entertainment organizations to manage the creation, packaging, distribution, monetization, and performance of digital or physical content. Products in this category typically support workflows such as content production, digital asset management, publishing operations, ad sales and monetization, audience analytics, streaming delivery, rights management, subscriber management, and media operations orchestration.\r\n\r\nUnlike horizontal content or collaboration software, media vertical software is tailored to the operational economics, distribution models, audience measurement systems, and rights-driven workflows specific to media and entertainment businesses. Buyers usually care about content velocity, monetization, audience reach, rights control, and multi-channel distribution support."
+                },
+                {
+                  "id": "vertical-tech-software-legal",
+                  "level": "L3",
+                  "name": "Legal",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Legal"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "A vertical-specific software market designed for law firms, in-house legal teams, courts, and legal service providers to manage matters, case workflows, legal research, contracts, discovery, billing, and compliance. The market is defined by document-heavy, precedent-driven, highly regulated workflows that require strong auditability and matter-level control.",
+                  "expandedDefinition": "A vertical-specific software market designed for law firms, in-house legal teams, courts, and legal service providers to manage matters, case workflows, legal research, contracts, discovery, billing, and compliance. The market is defined by document-heavy, precedent-driven, highly regulated workflows that require strong auditability and matter-level control.\r\n\r\nThe segment is centered on legal work products, deadlines, evidence, and client or case management. Buyers evaluate software on matter organization, document handling, research support, billing, workflow control, and the ability to maintain defensible records across legal processes."
+                },
+                {
+                  "id": "vertical-tech-software-real-estate",
+                  "level": "L3",
+                  "name": "Real Estate",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Real Estate"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "A vertical-specific software market designed for property owners, brokers, developers, REITs, and property managers to manage leasing, property operations, tenant relationships, transactions, maintenance, and real estate analytics. Products in this market support the operational and financial lifecycle of residential, commercial, and mixed-use properties.",
+                  "expandedDefinition": "A vertical-specific software market designed for property owners, brokers, developers, REITs, and property managers to manage leasing, property operations, tenant relationships, transactions, maintenance, and real estate analytics. Products in this market support the operational and financial lifecycle of residential, commercial, and mixed-use properties.\r\n\r\nThe market includes software used to market, transact, operate, and maintain real estate assets. Buyers care about leasing efficiency, tenant experience, property-level visibility, and the ability to manage portfolios across multiple assets and locations."
+                },
+                {
+                  "id": "vertical-tech-software-education-and-learning",
+                  "level": "L3",
+                  "name": "Education and Learning",
+                  "path": [
+                    "Vertical",
+                    "Tech",
+                    "Software",
+                    "Education and Learning"
+                  ],
+                  "children": [],
+                  "isHorizontal": false,
+                  "additiveToSoftwareMarket": false,
+                  "definition": "A vertical-specific software market designed for schools, universities, training providers, and education organizations to manage learning delivery, student administration, assessments, curriculum, and institutional operations. The market includes learning management, student information, virtual classroom, assessment, and administrative systems tailored to educational environments.",
+                  "expandedDefinition": "A vertical-specific software market designed for schools, universities, training providers, and education organizations to manage learning delivery, student administration, assessments, curriculum, and institutional operations. The market includes learning management, student information, virtual classroom, assessment, and administrative systems tailored to educational environments.\r\n\r\nThe segment is defined by the workflows of teaching, learning, student support, and educational administration. Buyers usually evaluate these products on usability, instructional support, administrative efficiency, and their ability to connect learners, educators, and institutional processes."
+                }
+              ],
+              "isHorizontal": false,
+              "additiveToSoftwareMarket": false,
+              "definition": "Commercial and internally developed digital products that process information, automate workflows, manage infrastructure, enable transactions, support decision-making, or facilitate digital interactions across consumers, enterprises, and public institutions. This umbrella market includes both horizontal software used across industries and vertical software built for specialized operational environments.",
+              "expandedDefinition": "Commercial and internally developed digital products that process information, automate workflows, manage infrastructure, enable transactions, support decision-making, or facilitate digital interactions across consumers, enterprises, and public institutions. This umbrella market spans both horizontal software used across industries and vertical software built for specialized operating environments, but it excludes hardware and pure professional services.\r\n\r\nAt the top of the taxonomy, this category is intentionally broad: it captures software as a product class rather than a use case or an industry. The practical boundary is that the offering must be a repeatable software product, platform, or subscription service that can be sold, licensed, or deployed independently of custom implementation work. Software products are differentiated by the workflow they own, the users they serve, and whether they operate as a system of record, system of engagement, control plane, or infrastructure layer."
+            }
+          ],
+          "isHorizontal": false,
+          "additiveToSoftwareMarket": false
+        }
+      ],
+      "isHorizontal": false,
+      "additiveToSoftwareMarket": false
+    }
+  ]
+}
