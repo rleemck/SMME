@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { useModel } from "@/store/ModelStore";
 import { Edit3, Minus, Plus, Trash2, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import MarketModelCanvas from "@/components/MarketModelCanvas";
 
 type BoxType = "data" | "assumption" | "calculation";
 type Operator = "×" | "+" | "−" | "÷" | "=";
@@ -158,6 +159,10 @@ const GRID_SIZE = 20;
 const BOX_HEIGHT = 230;
 
 export default function ModelEngine() {
+  return <MarketModelCanvas />;
+}
+
+function LegacyModelEngine() {
   const { market } = useModel();
   const [boxes, setBoxes] = useState<CanvasBox[]>(BASE_BOXES);
   const [connections, setConnections] = useState<Connection[]>(BASE_CONNECTIONS);
