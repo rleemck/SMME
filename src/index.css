@@ -81,4 +81,9 @@
                       linear-gradient(to bottom, hsl(var(--border) / 0.4) 1px, transparent 1px);
     background-size: 24px 24px;
   }
+
+  .canvas-dot-grid {
+    background-image: radial-gradient(circle, rgb(148 163 184 / 0.35) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
 }
