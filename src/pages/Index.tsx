@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useModel } from "@/store/ModelStore";
+import { useModel, US_GEOGRAPHY, US_GEOGRAPHY_HELPER } from "@/store/ModelStore";
 import { TaxonomySelector } from "@/components/taxonomy/TaxonomySelector";
 import { ArrowRight, FileText, Layers, Calculator, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -12,32 +12,32 @@ import { toast } from "sonner";
 export default function Index() {
   const navigate = useNavigate();
   const {
-    market,
     setMarket,
-    primarySegment,
+    selectedSegments,
     generateScoping,
     scopingLoading,
     useTaxonomy,
     setUseTaxonomy,
     resetAssumptions,
+    market,
   } = useModel();
-  const [geo, setGeo] = useState(market.geography);
   const [tf, setTf] = useState(market.timeframe);
   const [defaults, setDefaults] = useState(true);
   const [excel, setExcel] = useState(true);
 
   const submit = async () => {
-    if (!primarySegment) {
-      toast.error("Select a taxonomy segment to define your market.");
+    if (selectedSegments.length === 0) {
+      toast.error("Select at least one taxonomy segment to define your market.");
       return;
     }
+    const primary = selectedSegments.find((s) => s.isPrimary) ?? selectedSegments[0];
     setMarket({
-      name: primarySegment.name,
-      description: primarySegment.expandedDefinition ?? primarySegment.definition ?? primarySegment.name,
-      geography: geo,
+      name: primary.name,
+      description: primary.expandedDefinition ?? primary.definition ?? primary.name,
+      geography: US_GEOGRAPHY,
       timeframe: tf,
-      marketType: primarySegment.isHorizontal === false ? "vertical" : "horizontal",
-      dataSource: "SEC / public company filings",
+      marketType: "horizontal",
+      dataSource: "SEC / public company filings (US)",
     });
     if (defaults) resetAssumptions();
     await generateScoping();
@@ -50,8 +50,8 @@ export default function Index() {
         <div className="mds-eyebrow mb-2">Market Definition</div>
         <h1 className="text-3xl font-semibold text-mds-navy">Define your software market</h1>
         <p className="text-muted-foreground mt-2 max-w-2xl">
-          Select a segment from the McKinsey software market taxonomy. The Scoping Expert will match public
-          vendors using expanded definitions and SEC filings, then map revenue into the model workspace.
+          Select one or more taxonomy segments. The Scoping Expert will match public US vendors using expanded
+          definitions and SEC 10-K filings, then map revenue into the model workspace.
         </p>
       </div>
 
@@ -62,19 +62,15 @@ export default function Index() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label>Geography</Label>
-              <Select value={geo} onValueChange={setGeo}>
-                <SelectTrigger className="mt-2">
+              <Select value={US_GEOGRAPHY} disabled>
+                <SelectTrigger className="mt-2 opacity-60 cursor-not-allowed">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="United States">United States</SelectItem>
-                  {["Global", "North America", "EMEA", "APAC", "LATAM"].map((g) => (
-                    <SelectItem key={g} value={g}>
-                      {g}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value={US_GEOGRAPHY}>{US_GEOGRAPHY}</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{US_GEOGRAPHY_HELPER}</p>
             </div>
             <div>
               <Label>Timeframe</Label>
@@ -108,7 +104,7 @@ export default function Index() {
             className="w-full gap-2"
             size="lg"
             onClick={submit}
-            disabled={!primarySegment || scopingLoading}
+            disabled={selectedSegments.length === 0 || scopingLoading}
           >
             {scopingLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -123,7 +119,7 @@ export default function Index() {
       <div className="grid grid-cols-3 gap-4 mt-8">
         <KpiCard icon={FileText} label="Taxonomy segments" value="63" />
         <KpiCard icon={Layers} label="Public companies" value="5,300+" />
-        <KpiCard icon={Calculator} label="Data source" value="SEC" />
+        <KpiCard icon={Calculator} label="Data source" value="SEC (US)" />
       </div>
     </div>
   );

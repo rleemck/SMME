@@ -1,4 +1,4 @@
-import type { MappingStatus } from "@/types/taxonomy";
+import type { ConfidenceBreakdown, EvidenceItem, MappingStatus, SECFilingSource } from "@/types/taxonomy";
 
 export type Vendor = {
   id: string;
@@ -14,7 +14,14 @@ export type Vendor = {
   growth: number;
   share: number;
   rationale?: string;
+  confidenceRationale?: string;
+  confidenceBreakdown?: ConfidenceBreakdown;
   supportingEvidence?: string[];
+  evidenceItems?: EvidenceItem[];
+  secFiling?: SECFilingSource;
+  cik?: string;
+  accessionNumber?: string;
+  filingUrl?: string;
   matchedSegment?: string;
   taxonomyPath?: string[];
   needsReview?: boolean;
@@ -24,6 +31,13 @@ export type Vendor = {
   notes?: string;
   fiscalYear?: number;
   filingSource?: string;
+  /** AI recommended inclusion at match time */
+  originalAIRecommendation?: boolean;
+  /** Original status from AI matching (for reset) */
+  originalAIStatus?: "Included" | "Pending" | "Excluded";
+  /** User changed inclusion via bulk or manual toggle */
+  manuallyOverridden?: boolean;
+  excludedReason?: string;
 };
 
 export type Assumption = {

@@ -3,15 +3,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useModel, fmtUsdB, fmtUsdM } from "@/store/ModelStore";
-import { TrendingUp, ChevronRight } from "lucide-react";
+import { useModel, fmtUsdB, fmtUsdM, US_GEOGRAPHY } from "@/store/ModelStore";
+import { TrendingUp, ChevronRight, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { MappingStatus } from "@/types/taxonomy";
+import { ConfidenceBreakdownView } from "@/components/taxonomy/ConfidenceBreakdownView";
 
 export default function RevenueMapping() {
-  const { vendors, updateVendor, tam, baseRevenue, primarySegment } = useModel();
+  const { includedVendors, updateVendor, tam, baseRevenue, primarySegment, vendorUniverseSummary } = useModel();
   const navigate = useNavigate();
-  const included = vendors.filter((v) => v.status === "Included" && v.mappingStatus !== "excluded");
+  const included = includedVendors;
 
   return (
     <div className="p-8 animate-fade-in">
@@ -20,8 +21,12 @@ export default function RevenueMapping() {
           <div className="mds-eyebrow mb-1">Step 2 · Revenue mapping</div>
           <h1 className="text-2xl font-semibold text-mds-navy">Segment revenue attribution</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Map public filing revenue to {primarySegment?.name ?? "selected segment"} with overrides and
-            review status.
+            Map SEC filing revenue to {primarySegment?.name ?? "selected segment"} ({US_GEOGRAPHY}) with
+            overrides and review status. Showing {included.length} included vendor(s)
+            {vendorUniverseSummary.excluded > 0
+              ? ` (${vendorUniverseSummary.excluded} excluded at scoping)`
+              : ""}
+            .
           </p>
         </div>
         <Button onClick={() => navigate("/model")} className="gap-2">
@@ -30,7 +35,7 @@ export default function RevenueMapping() {
       </div>
 
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <Kpi label="Vendors included" value={`${included.length}`} sub={`${vendors.length} total`} />
+        <Kpi label="Vendors included" value={`${included.length}`} sub={`${vendorUniverseSummary.total} in universe`} />
         <Kpi
           label="Avg confidence"
           value={`${Math.round((included.reduce((s, v) => s + v.confidence, 0) / Math.max(included.length, 1)) * 100)}%`}
@@ -67,12 +72,25 @@ export default function RevenueMapping() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vendors.map((v) => (
+            {included.map((v) => (
               <TableRow key={v.id}>
                 <TableCell className="font-medium">{v.name}</TableCell>
                 <TableCell className="font-mono text-xs">{v.ticker}</TableCell>
                 <TableCell className="text-xs">{v.exchange ?? "—"}</TableCell>
-                <TableCell className="text-xs">{v.filingSource ?? v.filingType}</TableCell>
+                <TableCell className="text-xs">
+                  {v.filingUrl ? (
+                    <a
+                      href={v.filingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-mds-blue hover:underline"
+                    >
+                      {v.filingType} <ExternalLink className="h-3 w-3" />
+                    </a>
+                  ) : (
+                    v.filingSource ?? v.filingType
+                  )}
+                </TableCell>
                 <TableCell>{v.fiscalYear ?? 2025}</TableCell>
                 <TableCell className="text-right">
                   <Input
@@ -101,7 +119,13 @@ export default function RevenueMapping() {
                     onChange={(e) => updateVendor(v.id, { segmentShare: Number(e.target.value) })}
                   />
                 </TableCell>
-                <TableCell className="text-right">{Math.round(v.confidence * 100)}%</TableCell>
+                <TableCell>
+                  <ConfidenceBreakdownView
+                    confidence={v.confidence}
+                    breakdown={v.confidenceBreakdown}
+                    needsReview={v.needsReview}
+                  />
+                </TableCell>
                 <TableCell>
                   <Select
                     value={v.mappingStatus ?? "mapped"}
@@ -134,6 +158,11 @@ export default function RevenueMapping() {
             ))}
           </TableBody>
         </Table>
+        {included.length === 0 && (
+          <p className="p-6 text-sm text-muted-foreground text-center">
+            No vendors included. Return to Scoping Expert and include at least one vendor.
+          </p>
+        )}
       </div>
     </div>
   );

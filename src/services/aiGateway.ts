@@ -1,11 +1,16 @@
-import type { TaxonomySelection, VendorMatch } from "@/types/taxonomy";
-import type { SecFiling } from "./secClient";
+import type {
+  EvidenceItem,
+  SECFilingSource,
+  SelectedTaxonomySegment,
+  TaxonomySelection,
+  VendorMatch,
+} from "@/types/taxonomy";
+import { computeConfidenceBreakdown } from "./confidenceScoring";
 
 export type AiMatchRequest = {
-  segment: TaxonomySelection;
-  adjacentSegments?: TaxonomySelection[];
+  segments: SelectedTaxonomySegment[];
   candidateCompanies: { name: string; ticker: string; exchange?: string; description?: string }[];
-  filingExcerpts?: { ticker: string; excerpt: string }[];
+  filings: Map<string, SECFilingSource>;
 };
 
 export interface AiGateway {
@@ -44,44 +49,108 @@ const SEGMENT_VENDOR_SEEDS: Record<string, { ticker: string; name: string; share
   ],
 };
 
-function pickSeed(segment: TaxonomySelection) {
-  const text = `${segment.name} ${segment.expandedDefinition ?? ""}`.toLowerCase();
+function pickSeed(segments: SelectedTaxonomySegment[]) {
+  const text = segments
+    .map((s) => `${s.name} ${s.expandedDefinition ?? s.definition ?? ""}`)
+    .join(" ")
+    .toLowerCase();
   if (/security|cyber|endpoint|identity|zero trust|cnapp/i.test(text)) return SEGMENT_VENDOR_SEEDS.security;
   if (/analytics|business intelligence|bi\b|dashboard/i.test(text)) return SEGMENT_VENDOR_SEEDS.analytics;
   if (/crm|customer relationship|sales force automation/i.test(text)) return SEGMENT_VENDOR_SEEDS.crm;
   return SEGMENT_VENDOR_SEEDS.default;
 }
 
-export const mockAiGateway: AiGateway = {
+function buildEvidenceItems(filing: SECFilingSource | undefined, segments: SelectedTaxonomySegment[]): EvidenceItem[] {
+  const items: EvidenceItem[] = [];
+  const primary = segments.find((s) => s.isPrimary) ?? segments[0];
+
+  if (primary?.expandedDefinition || primary?.definition) {
+    items.push({
+      text: (primary.expandedDefinition ?? primary.definition)!.slice(0, 280),
+      section: "Taxonomy definition (primary)",
+    });
+  }
+
+  for (const seg of segments.filter((s) => !s.isPrimary)) {
+    if (seg.definition) {
+      items.push({
+        text: `${seg.name}: ${seg.definition.slice(0, 200)}`,
+        section: "Adjacent segment definition",
+      });
+    }
+  }
+
+  if (filing) {
+    filing.sourceSnippets.forEach((s) => {
+      items.push({
+        text: s.text,
+        section: s.section,
+        filingUrl: s.filingUrl,
+        formType: filing.formType,
+        fiscalYear: filing.fiscalYear,
+        filingDate: filing.filingDate,
+      });
+    });
+    if (filing.businessDescription && !items.some((i) => i.section?.includes("Business"))) {
+      items.push({
+        text: filing.businessDescription.slice(0, 400),
+        section: "Item 1 — Business",
+        filingUrl: filing.filingUrl,
+        formType: filing.formType,
+        fiscalYear: filing.fiscalYear,
+        filingDate: filing.filingDate,
+      });
+    }
+  }
+
+  return items;
+}
+
+function filingToExcerptStrings(filing: SECFilingSource): string[] {
+  return [
+    filing.businessDescription ?? "",
+    ...(filing.segmentRevenueText ?? []),
+    ...filing.sourceSnippets.map((s) => s.text),
+  ].filter(Boolean);
+}
+
+export const structuredAiGateway: AiGateway = {
   async matchVendors(req) {
-    await new Promise((r) => setTimeout(r, 600));
-    const seeds = pickSeed(req.segment);
+    const primary = req.segments.find((s) => s.isPrimary) ?? req.segments[0];
+    if (!primary) return [];
+
+    const seeds = pickSeed(req.segments);
     const companyByTicker = new Map(
       req.candidateCompanies.map((c) => [c.ticker.toUpperCase(), c]),
     );
 
-    return seeds.map((s, i) => {
+    return seeds.map((s) => {
       const co = companyByTicker.get(s.ticker);
-      const filing = req.filingExcerpts?.find((f) => f.ticker === s.ticker);
-      const confidence = 0.92 - i * 0.04 + (filing ? 0.03 : 0);
-      const baseRev = 800 + Math.round(Math.random() * 4000);
+      const filing = req.filings.get(s.ticker);
+      const breakdown = computeConfidenceBreakdown(
+        req.segments,
+        co?.name ?? s.name,
+        co?.description,
+        filing,
+      );
+      const confidence = breakdown.finalConfidence;
+      const totalRev =
+        filing?.revenueLineItems?.[0]?.value ?? 800 + Math.round(Math.random() * 4000);
+      const evidenceItems = buildEvidenceItems(filing, req.segments);
+
       return {
-        companyName: co?.name ?? s.name,
+        companyName: co?.name ?? filing?.companyName ?? s.name,
         ticker: s.ticker,
         exchange: co?.exchange,
-        confidence: Math.min(0.98, Math.max(0.65, confidence)),
-        matchedSegment: req.segment.name,
-        taxonomyPath: req.segment.path,
-        rationale: `Matched via expanded definition keywords, product overlap with "${req.segment.name}", and ${
-          filing ? "SEC 10-K excerpt alignment" : "taxonomy segment naming"
-        }.`,
-        supportingEvidence: [
-          (req.segment.expandedDefinition?.slice(0, 180)
-            ? req.segment.expandedDefinition.slice(0, 180) + "…"
-            : req.segment.definition) ?? "",
-          filing?.excerpt ?? `Ticker ${s.ticker} appears in public software universe (Companies tab).`,
-        ].filter(Boolean),
-        estimatedSegmentRevenue: Math.round(baseRev * s.share),
+        confidence,
+        confidenceBreakdown: breakdown,
+        matchedSegment: primary.name,
+        taxonomyPath: primary.path,
+        rationale: breakdown.rationale,
+        supportingEvidence: evidenceItems.map((e) => e.text).filter(Boolean),
+        evidenceItems,
+        secFiling: filing,
+        estimatedSegmentRevenue: Math.round(totalRev * s.share),
         estimatedSegmentShare: s.share,
         needsReview: confidence < 0.8,
       } satisfies VendorMatch;
@@ -89,14 +158,38 @@ export const mockAiGateway: AiGateway = {
   },
 };
 
+/** @deprecated use structuredAiGateway */
+export const mockAiGateway = structuredAiGateway;
+
 export async function enrichWithFilings(
   tickers: string[],
-  sec: { getLatestFilings(t: string): Promise<SecFiling | null> },
-): Promise<{ ticker: string; excerpt: string }[]> {
-  const out: { ticker: string; excerpt: string }[] = [];
+  sec: { getLatestFiling(t: string): Promise<SECFilingSource | null> },
+): Promise<Map<string, SECFilingSource>> {
+  const map = new Map<string, SECFilingSource>();
   for (const t of tickers.slice(0, 8)) {
-    const f = await sec.getLatestFilings(t);
-    if (f) out.push({ ticker: t, excerpt: f.excerpt });
+    try {
+      const f = await sec.getLatestFiling(t);
+      if (f) map.set(t.toUpperCase(), f);
+    } catch {
+      /* skip unavailable */
+    }
   }
-  return out;
+  return map;
+}
+
+/** Legacy adapter */
+export function segmentsFromTaxonomy(
+  segment: TaxonomySelection,
+  adjacent: TaxonomySelection[] = [],
+): SelectedTaxonomySegment[] {
+  const toSeg = (sel: TaxonomySelection, isPrimary: boolean): SelectedTaxonomySegment => ({
+    id: sel.nodeId,
+    name: sel.name,
+    level: (["L1", "L2", "L3", "L4", "L5"].includes(sel.level) ? sel.level : "L3") as SelectedTaxonomySegment["level"],
+    path: sel.path,
+    definition: sel.definition,
+    expandedDefinition: sel.expandedDefinition,
+    isPrimary,
+  });
+  return [toSeg(segment, true), ...adjacent.map((a) => toSeg(a, false))];
 }

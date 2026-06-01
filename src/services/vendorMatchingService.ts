@@ -1,7 +1,8 @@
-import type { TaxonomySelection, VendorMatch, PublicCompany } from "@/types/taxonomy";
+import type { SelectedTaxonomySegment, TaxonomySelection, VendorMatch, PublicCompany } from "@/types/taxonomy";
 import companiesData from "@/data/companies.json";
-import { mockAiGateway, enrichWithFilings } from "./aiGateway";
-import { mockSecClient } from "./secClient";
+import { segmentToSelection } from "@/lib/taxonomy/segments";
+import { structuredAiGateway, enrichWithFilings, segmentsFromTaxonomy } from "./aiGateway";
+import { getSecClient, useMockSec } from "./secClient";
 
 const companies = companiesData as PublicCompany[];
 
@@ -25,29 +26,59 @@ export function searchCompanies(query: string, limit = 50): PublicCompany[] {
     .slice(0, limit);
 }
 
+function pickCandidateTickers(segments: SelectedTaxonomySegment[]): string[] {
+  const text = segments
+    .map((s) => `${s.name} ${s.expandedDefinition ?? s.definition ?? ""}`)
+    .join(" ")
+    .toLowerCase();
+
+  if (/security|cyber|endpoint/i.test(text)) {
+    return ["CRWD", "PANW", "ZS", "FTNT", "S", "OKTA", "MSFT"];
+  }
+  if (/analytics|data platform|warehouse/i.test(text)) {
+    return ["SNOW", "DDOG", "MSFT", "ORCL", "CRM", "PLTR"];
+  }
+  return ["MSFT", "ORCL", "CRM", "ADBE", "NOW", "PANW", "CRWD", "ZS", "SNOW", "DDOG"];
+}
+
 export async function runVendorMatching(
   segment: TaxonomySelection,
   adjacent: TaxonomySelection[] = [],
+  segments?: SelectedTaxonomySegment[],
 ): Promise<VendorMatch[]> {
-  const seeds = ["MSFT", "ORCL", "CRM", "ADBE", "NOW", "PANW", "CRWD", "ZS", "SNOW", "DDOG"];
+  const allSegments = segments ?? segmentsFromTaxonomy(segment, adjacent);
+  const seeds = pickCandidateTickers(allSegments);
   const candidates = seeds
     .map((t) => TICKER_INDEX.get(t))
     .filter(Boolean) as PublicCompany[];
 
-  const filingExcerpts = await enrichWithFilings(
+  const sec = getSecClient();
+  const filings = await enrichWithFilings(
     candidates.map((c) => c.ticker),
-    mockSecClient,
+    sec,
   );
 
-  return mockAiGateway.matchVendors({
-    segment,
-    adjacentSegments: adjacent,
+  if (!useMockSec() && filings.size === 0) {
+    console.warn("No SEC filings retrieved; vendor evidence may be limited.");
+  }
+
+  return structuredAiGateway.matchVendors({
+    segments: allSegments,
     candidateCompanies: candidates.map((c) => ({
       name: c.companyName,
       ticker: c.ticker,
       exchange: c.exchange,
       description: c.description,
     })),
-    filingExcerpts,
+    filings,
   });
+}
+
+export async function runVendorMatchingFromSegments(
+  segments: SelectedTaxonomySegment[],
+): Promise<VendorMatch[]> {
+  const primary = segments.find((s) => s.isPrimary) ?? segments[0];
+  if (!primary) return [];
+  const adjacent = segments.filter((s) => !s.isPrimary).map(segmentToSelection);
+  return runVendorMatching(segmentToSelection(primary), adjacent, segments);
 }

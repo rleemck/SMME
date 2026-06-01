@@ -8,19 +8,22 @@ import { getTaxonomyNode } from "@/lib/taxonomy";
 
 type Props = {
   roots: TaxonomyNode[];
-  selectedId: string | null;
+  selectedId?: string | null;
+  selectedIds?: string[];
   onSelect: (sel: TaxonomySelection) => void;
 };
 
 function TreeNode({
   node,
   selectedId,
+  selectedIds,
   onSelect,
   expanded,
   toggle,
 }: {
   node: TaxonomyNode;
   selectedId: string | null;
+  selectedIds?: string[];
   onSelect: (sel: TaxonomySelection) => void;
   expanded: Set<string>;
   toggle: (id: string) => void;
@@ -30,6 +33,9 @@ function TreeNode({
   const isOpen = expanded.has(node.id);
   const depth = levelDepth(node.level);
   const showExpand = depth >= 3; // L4+ collapsible by default
+
+  const isSelected =
+    selectedId === node.id || (selectedIds?.includes(node.id) ?? false);
 
   const handleSelect = () => {
     const sel: TaxonomySelection = flat
@@ -52,7 +58,7 @@ function TreeNode({
       <div
         className={cn(
           "flex items-center gap-1 py-1.5 px-2 rounded-md cursor-pointer text-sm",
-          selectedId === node.id ? "bg-mds-navy text-white" : "hover:bg-surface-muted",
+          isSelected ? "bg-mds-navy text-white" : "hover:bg-surface-muted",
         )}
         style={{ paddingLeft: `${depth * 12 + 8}px` }}
       >
@@ -82,7 +88,7 @@ function TreeNode({
             variant="outline"
             className={cn(
               "text-[10px] shrink-0",
-              selectedId === node.id && "border-white/40 text-white",
+              isSelected && "border-white/40 text-white",
             )}
           >
             {node.level}
@@ -97,6 +103,7 @@ function TreeNode({
               key={c.id}
               node={c}
               selectedId={selectedId}
+              selectedIds={selectedIds}
               onSelect={onSelect}
               expanded={expanded}
               toggle={toggle}
@@ -108,7 +115,7 @@ function TreeNode({
   );
 }
 
-export function TaxonomyTree({ roots, selectedId, onSelect }: Props) {
+export function TaxonomyTree({ roots, selectedId = null, selectedIds, onSelect }: Props) {
   const [expanded, setExpanded] = useState(() => getDefaultExpandedIds());
 
   const toggle = (id: string) => {
@@ -136,6 +143,7 @@ export function TaxonomyTree({ roots, selectedId, onSelect }: Props) {
           key={r.id}
           node={r}
           selectedId={selectedId}
+          selectedIds={selectedIds}
           onSelect={onSelect}
           expanded={expanded}
           toggle={toggle}
