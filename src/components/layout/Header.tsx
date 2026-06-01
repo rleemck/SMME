@@ -10,7 +10,7 @@ export default function Header() {
         <div className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Market</div>
         <div className="text-sm font-semibold text-mds-navy truncate">{market.name}</div>
         <span className="text-muted-foreground">·</span>
-        <div className="text-sm text-muted-foreground">{market.geography}</div>
+        <div className="text-sm text-muted-foreground">{market.dataSource}</div>
         <span className="text-muted-foreground">·</span>
         <div className="text-sm text-muted-foreground">{market.timeframe}</div>
       </div>

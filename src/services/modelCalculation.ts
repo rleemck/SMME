@@ -1,5 +1,6 @@
 import type { Assumption } from "@/lib/mockData";
 import type { Vendor } from "@/lib/mockData";
+import { isVendorIncluded } from "@/lib/vendorSelection";
 
 export type TamBreakdown = {
   vendorRevenueSum: number;
@@ -9,12 +10,8 @@ export type TamBreakdown = {
   tam: number;
 };
 
-export function calculateTam(
-  vendors: Vendor[],
-  assumptions: Assumption[],
-  geography: string,
-): TamBreakdown {
-  const included = vendors.filter((v) => v.status === "Included" && v.mappingStatus !== "excluded");
+export function calculateTam(vendors: Vendor[], assumptions: Assumption[]): TamBreakdown {
+  const included = vendors.filter(isVendorIncluded);
   const vendorRevenueSum = included.reduce(
     (s, v) => s + (v.segmentRevenue ?? v.revenue),
     0,
@@ -26,12 +23,9 @@ export function calculateTam(
     assumptions.find((a) => a.name === "Private Company Factor")?.value ?? 1.08;
   const segmentAdj =
     assumptions.find((a) => a.name === "Segment Adjustment Factor")?.value ?? 1.0;
-  const intlShare =
-    (assumptions.find((a) => a.name === "International Share")?.value ?? 0) / 100;
 
   const privateCompanyAdjustment = vendorRevenueSum * (privateFactor - 1);
-  const internationalAdjustment =
-    geography === "United States" ? 0 : vendorRevenueSum * intlShare * 0.15;
+  const internationalAdjustment = 0;
   const otherAdjustments = vendorRevenueSum * segmentAdj * growth * 0.05;
 
   const tam =

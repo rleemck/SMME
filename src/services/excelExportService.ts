@@ -5,7 +5,7 @@ import type { TamBreakdown } from "./modelCalculation";
 
 export type ExportPayload = {
   marketName: string;
-  geography: string;
+  dataSource: string;
   timeframe: string;
   primarySegment: TaxonomySelection | null;
   adjacentSegments: TaxonomySelection[];
@@ -21,7 +21,7 @@ export function exportModelWorkbook(payload: ExportPayload): void {
     ["Software Market Model Engine — Executive Summary"],
     [],
     ["Market", payload.marketName],
-    ["Geography", payload.geography],
+    ["Data source", payload.dataSource],
     ["Timeframe", payload.timeframe],
     ["Primary segment", payload.primarySegment?.path.join(" > ") ?? "—"],
     ["TAM ($M)", Math.round(payload.tam.tam)],

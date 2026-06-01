@@ -1,8 +1,8 @@
 import type { SelectedTaxonomySegment, TaxonomySelection, VendorMatch, PublicCompany } from "@/types/taxonomy";
 import companiesData from "@/data/companies.json";
 import { segmentToSelection } from "@/lib/taxonomy/segments";
-import { structuredAiGateway, enrichWithFilings, segmentsFromTaxonomy } from "./aiGateway";
-import { getSecClient, useMockSec } from "./secClient";
+import { structuredAiGateway, segmentsFromTaxonomy } from "./aiGateway";
+import { enrichWithSecRevenue, useMockSec } from "./secClient";
 
 const companies = companiesData as PublicCompany[];
 
@@ -52,14 +52,15 @@ export async function runVendorMatching(
     .map((t) => TICKER_INDEX.get(t))
     .filter(Boolean) as PublicCompany[];
 
-  const sec = getSecClient();
-  const filings = await enrichWithFilings(
-    candidates.map((c) => c.ticker),
-    sec,
-  );
+  const secRevenues = await enrichWithSecRevenue(candidates.map((c) => c.ticker));
 
-  if (!useMockSec() && filings.size === 0) {
-    console.warn("No SEC filings retrieved; vendor evidence may be limited.");
+  if (!useMockSec()) {
+    const liveCount = [...secRevenues.values()].filter(
+      (s) => s.retrievalStatus === "live" || s.retrievalStatus === "fallback_10q",
+    ).length;
+    if (liveCount === 0) {
+      console.warn("No live SEC data retrieved for candidate vendors.");
+    }
   }
 
   return structuredAiGateway.matchVendors({
@@ -70,7 +71,7 @@ export async function runVendorMatching(
       exchange: c.exchange,
       description: c.description,
     })),
-    filings,
+    secRevenues,
   });
 }
 

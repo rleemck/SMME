@@ -3,30 +3,47 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useModel, fmtUsdB, fmtUsdM, US_GEOGRAPHY } from "@/store/ModelStore";
+import { useModel, fmtUsdB, fmtUsdM, REVENUE_HELPER_TEXT } from "@/store/ModelStore";
+import { applySegmentRevenueFromShare } from "@/lib/vendorRevenue";
 import { TrendingUp, ChevronRight, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { MappingStatus } from "@/types/taxonomy";
-import { ConfidenceBreakdownView } from "@/components/taxonomy/ConfidenceBreakdownView";
+import { TextExpandable } from "@/components/taxonomy/TextExpandable";
+import { SecStatusBadge } from "@/components/sec/SecStatusBadge";
+import { SecMockBanner } from "@/components/sec/SecMockBanner";
 
 export default function RevenueMapping() {
-  const { includedVendors, updateVendor, tam, baseRevenue, primarySegment, vendorUniverseSummary } = useModel();
+  const {
+    includedVendors,
+    updateVendor,
+    tam,
+    baseRevenue,
+    primarySegment,
+    vendorUniverseSummary,
+  } = useModel();
   const navigate = useNavigate();
   const included = includedVendors;
 
+  const patchRevenue = (id: string, patch: Parameters<typeof updateVendor>[1]) => {
+    const v = included.find((x) => x.id === id);
+    if (!v) return;
+    updateVendor(id, applySegmentRevenueFromShare(v, patch));
+  };
+
   return (
     <div className="p-8 animate-fade-in">
+      <div className="mb-4">
+        <SecMockBanner />
+      </div>
       <div className="flex items-end justify-between mb-6">
         <div>
           <div className="mds-eyebrow mb-1">Step 2 · Revenue mapping</div>
           <h1 className="text-2xl font-semibold text-mds-navy">Segment revenue attribution</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Map SEC filing revenue to {primarySegment?.name ?? "selected segment"} ({US_GEOGRAPHY}) with
-            overrides and review status. Showing {included.length} included vendor(s)
+          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+            {REVENUE_HELPER_TEXT} Showing {included.length} included vendor(s)
             {vendorUniverseSummary.excluded > 0
-              ? ` (${vendorUniverseSummary.excluded} excluded at scoping)`
-              : ""}
-            .
+              ? ` (${vendorUniverseSummary.excluded} excluded at scoping).`
+              : "."}
           </p>
         </div>
         <Button onClick={() => navigate("/model")} className="gap-2">
@@ -39,7 +56,7 @@ export default function RevenueMapping() {
         <Kpi
           label="Avg confidence"
           value={`${Math.round((included.reduce((s, v) => s + v.confidence, 0) / Math.max(included.length, 1)) * 100)}%`}
-          sub="Attribution"
+          sub="SEC-backed"
         />
         <Kpi label="Segment revenue sum" value={fmtUsdM(baseRevenue)} sub="Included vendors" />
         <Kpi
@@ -58,73 +75,88 @@ export default function RevenueMapping() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Company</TableHead>
+              <TableHead>Vendor</TableHead>
               <TableHead>Ticker</TableHead>
-              <TableHead>Exchange</TableHead>
-              <TableHead>Filing</TableHead>
+              <TableHead className="text-right">Total co. rev ($M)</TableHead>
               <TableHead>FY</TableHead>
-              <TableHead className="text-right">Total rev ($M)</TableHead>
+              <TableHead>Filing</TableHead>
+              <TableHead>Filing date</TableHead>
+              <TableHead>SEC link</TableHead>
+              <TableHead>XBRL tag</TableHead>
+              <TableHead className="min-w-[160px]">Source excerpt</TableHead>
+              <TableHead className="text-right">Est. share</TableHead>
               <TableHead className="text-right">Segment rev ($M)</TableHead>
-              <TableHead className="text-right">Share</TableHead>
-              <TableHead className="text-right">Confidence</TableHead>
+              <TableHead>SEC status</TableHead>
+              <TableHead className="min-w-[180px]">Confidence rationale</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Notes</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {included.map((v) => (
-              <TableRow key={v.id}>
+              <TableRow key={v.id} className="align-top">
                 <TableCell className="font-medium">{v.name}</TableCell>
                 <TableCell className="font-mono text-xs">{v.ticker}</TableCell>
-                <TableCell className="text-xs">{v.exchange ?? "—"}</TableCell>
-                <TableCell className="text-xs">
+                <TableCell className="text-right">
+                  <Input
+                    type="number"
+                    className="w-24 ml-auto text-right h-8"
+                    value={v.totalCompanyRevenue ?? v.revenue}
+                    onChange={(e) =>
+                      patchRevenue(v.id, {
+                        totalCompanyRevenue: Number(e.target.value),
+                        revenue: Number(e.target.value),
+                      })
+                    }
+                  />
+                </TableCell>
+                <TableCell className="text-xs">{v.fiscalYear ?? v.secRevenue?.fiscalYear ?? "—"}</TableCell>
+                <TableCell className="text-xs">{v.filingType ?? v.secRevenue?.formType}</TableCell>
+                <TableCell className="text-xs whitespace-nowrap">{v.secRevenue?.filingDate ?? "—"}</TableCell>
+                <TableCell>
                   {v.filingUrl ? (
                     <a
                       href={v.filingUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-mds-blue hover:underline"
+                      className="inline-flex items-center gap-1 text-mds-blue text-xs hover:underline"
                     >
-                      {v.filingType} <ExternalLink className="h-3 w-3" />
+                      View <ExternalLink className="h-3 w-3" />
                     </a>
                   ) : (
-                    v.filingSource ?? v.filingType
+                    "—"
                   )}
                 </TableCell>
-                <TableCell>{v.fiscalYear ?? 2025}</TableCell>
-                <TableCell className="text-right">
-                  <Input
-                    type="number"
-                    className="w-24 ml-auto text-right h-8"
-                    value={v.revenue}
-                    onChange={(e) => updateVendor(v.id, { revenue: Number(e.target.value) })}
-                  />
+                <TableCell className="text-[10px] font-mono max-w-[100px] truncate" title={v.revenueMetric}>
+                  {v.revenueMetric ?? "—"}
                 </TableCell>
-                <TableCell className="text-right">
-                  <Input
-                    type="number"
-                    className="w-24 ml-auto text-right h-8"
-                    value={v.segmentRevenue ?? v.revenue}
-                    onChange={(e) =>
-                      updateVendor(v.id, { segmentRevenue: Number(e.target.value), revenue: Number(e.target.value) })
-                    }
-                  />
+                <TableCell className="max-w-[180px]">
+                  <TextExpandable text={v.secRevenue?.sourceExcerpt ?? ""} maxChars={200} />
                 </TableCell>
                 <TableCell className="text-right">
                   <Input
                     type="number"
                     className="w-16 ml-auto text-right h-8"
                     step={0.01}
-                    value={v.segmentShare ?? (v.share / 100).toFixed(2)}
-                    onChange={(e) => updateVendor(v.id, { segmentShare: Number(e.target.value) })}
+                    min={0}
+                    max={1}
+                    value={v.segmentShare ?? v.share / 100}
+                    onChange={(e) => patchRevenue(v.id, { segmentShare: Number(e.target.value) })}
+                  />
+                </TableCell>
+                <TableCell className="text-right">
+                  <Input
+                    type="number"
+                    className="w-24 ml-auto text-right h-8"
+                    value={v.segmentRevenue ?? 0}
+                    onChange={(e) => updateVendor(v.id, { segmentRevenue: Number(e.target.value) })}
                   />
                 </TableCell>
                 <TableCell>
-                  <ConfidenceBreakdownView
-                    confidence={v.confidence}
-                    breakdown={v.confidenceBreakdown}
-                    needsReview={v.needsReview}
-                  />
+                  <SecStatusBadge status={v.secDataStatus} retrievedAt={v.secRetrievedAt} compact />
+                </TableCell>
+                <TableCell className="max-w-[200px]">
+                  <TextExpandable text={v.confidenceRationale ?? v.rationale ?? ""} />
                 </TableCell>
                 <TableCell>
                   <Select
@@ -146,7 +178,7 @@ export default function RevenueMapping() {
                     </SelectContent>
                   </Select>
                 </TableCell>
-                <TableCell className="min-w-[140px]">
+                <TableCell className="min-w-[120px]">
                   <Textarea
                     rows={1}
                     className="min-h-8 text-xs"

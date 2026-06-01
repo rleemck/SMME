@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useModel, US_GEOGRAPHY, US_GEOGRAPHY_HELPER } from "@/store/ModelStore";
+import { useModel, REVENUE_HELPER_TEXT } from "@/store/ModelStore";
 import { TaxonomySelector } from "@/components/taxonomy/TaxonomySelector";
+import { SecMockBanner } from "@/components/sec/SecMockBanner";
 import { ArrowRight, FileText, Layers, Calculator, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -34,10 +35,9 @@ export default function Index() {
     setMarket({
       name: primary.name,
       description: primary.expandedDefinition ?? primary.definition ?? primary.name,
-      geography: US_GEOGRAPHY,
       timeframe: tf,
       marketType: "horizontal",
-      dataSource: "SEC / public company filings (US)",
+      dataSource: "SEC EDGAR · total company revenue",
     });
     if (defaults) resetAssumptions();
     await generateScoping();
@@ -46,12 +46,15 @@ export default function Index() {
 
   return (
     <div className="p-8 max-w-5xl mx-auto animate-fade-in">
+      <div className="mb-6">
+        <SecMockBanner />
+      </div>
       <div className="mb-8">
         <div className="mds-eyebrow mb-2">Market Definition</div>
         <h1 className="text-3xl font-semibold text-mds-navy">Define your software market</h1>
         <p className="text-muted-foreground mt-2 max-w-2xl">
-          Select one or more taxonomy segments. The Scoping Expert will match public US vendors using expanded
-          definitions and SEC 10-K filings, then map revenue into the model workspace.
+          Select one or more taxonomy segments. The Scoping Expert matches vendors using SEC filings and
+          pulls total company revenue from the latest annual filing (10-K preferred).
         </p>
       </div>
 
@@ -59,19 +62,11 @@ export default function Index() {
         <div className="space-y-6">
           <TaxonomySelector />
 
+          <p className="text-xs text-muted-foreground leading-relaxed border-l-2 border-mds-blue pl-3">
+            {REVENUE_HELPER_TEXT}
+          </p>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label>Geography</Label>
-              <Select value={US_GEOGRAPHY} disabled>
-                <SelectTrigger className="mt-2 opacity-60 cursor-not-allowed">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={US_GEOGRAPHY}>{US_GEOGRAPHY}</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{US_GEOGRAPHY_HELPER}</p>
-            </div>
             <div>
               <Label>Timeframe</Label>
               <Select value={tf} onValueChange={setTf}>
@@ -119,7 +114,7 @@ export default function Index() {
       <div className="grid grid-cols-3 gap-4 mt-8">
         <KpiCard icon={FileText} label="Taxonomy segments" value="63" />
         <KpiCard icon={Layers} label="Public companies" value="5,300+" />
-        <KpiCard icon={Calculator} label="Data source" value="SEC (US)" />
+        <KpiCard icon={Calculator} label="Data source" value="SEC EDGAR" />
       </div>
     </div>
   );

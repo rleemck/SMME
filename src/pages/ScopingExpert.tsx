@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useModel, US_GEOGRAPHY } from "@/store/ModelStore";
+import { useModel } from "@/store/ModelStore";
+import { SecMockBanner } from "@/components/sec/SecMockBanner";
 import { ChevronRight, Sparkles, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DefinitionPreview } from "@/components/taxonomy/DefinitionPreview";
@@ -35,13 +36,16 @@ export default function ScopingExpert() {
 
   return (
     <div className="p-8 animate-fade-in">
+      <div className="mb-4">
+        <SecMockBanner />
+      </div>
       <div className="flex items-end justify-between mb-6 gap-4 flex-wrap">
         <div>
           <div className="mds-eyebrow mb-1">Step 1 · Software Scoping Expert</div>
           <h1 className="text-2xl font-semibold text-mds-navy">Vendor universe & taxonomy mapping</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {primarySegment
-              ? `${selectedSegments.length} segment(s) · ${US_GEOGRAPHY} · ${market.timeframe}`
+              ? `${selectedSegments.length} segment(s) · SEC total company revenue · ${market.timeframe}`
               : "No segment selected"}
           </p>
         </div>

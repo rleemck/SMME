@@ -1,16 +1,17 @@
 import type {
   EvidenceItem,
-  SECFilingSource,
   SelectedTaxonomySegment,
   TaxonomySelection,
   VendorMatch,
 } from "@/types/taxonomy";
+import type { SECRevenueSource } from "@/types/sec";
 import { computeConfidenceBreakdown } from "./confidenceScoring";
+import { buildEvidenceBackedRationale } from "./rationaleBuilder";
 
 export type AiMatchRequest = {
   segments: SelectedTaxonomySegment[];
   candidateCompanies: { name: string; ticker: string; exchange?: string; description?: string }[];
-  filings: Map<string, SECFilingSource>;
+  secRevenues: Map<string, SECRevenueSource>;
 };
 
 export interface AiGateway {
@@ -60,7 +61,7 @@ function pickSeed(segments: SelectedTaxonomySegment[]) {
   return SEGMENT_VENDOR_SEEDS.default;
 }
 
-function buildEvidenceItems(filing: SECFilingSource | undefined, segments: SelectedTaxonomySegment[]): EvidenceItem[] {
+function buildEvidenceItems(sec: SECRevenueSource | undefined, segments: SelectedTaxonomySegment[]): EvidenceItem[] {
   const items: EvidenceItem[] = [];
   const primary = segments.find((s) => s.isPrimary) ?? segments[0];
 
@@ -71,47 +72,28 @@ function buildEvidenceItems(filing: SECFilingSource | undefined, segments: Selec
     });
   }
 
-  for (const seg of segments.filter((s) => !s.isPrimary)) {
-    if (seg.definition) {
-      items.push({
-        text: `${seg.name}: ${seg.definition.slice(0, 200)}`,
-        section: "Adjacent segment definition",
-      });
-    }
+  if (sec?.sourceExcerpt) {
+    items.push({
+      text: sec.sourceExcerpt.slice(0, 500) + (sec.sourceExcerpt.length > 500 ? "…" : ""),
+      section: `SEC ${sec.formType} · ${sec.revenueMetric}`,
+      filingUrl: sec.filingUrl,
+      formType: sec.formType,
+      fiscalYear: sec.fiscalYear,
+      filingDate: sec.filingDate,
+    });
   }
 
-  if (filing) {
-    filing.sourceSnippets.forEach((s) => {
-      items.push({
-        text: s.text,
-        section: s.section,
-        filingUrl: s.filingUrl,
-        formType: filing.formType,
-        fiscalYear: filing.fiscalYear,
-        filingDate: filing.filingDate,
-      });
+  if (sec?.totalCompanyRevenue != null) {
+    items.push({
+      text: `Total company revenue: $${sec.totalCompanyRevenue.toLocaleString()}M (${sec.revenueMetric}, ${sec.formType})`,
+      section: "XBRL total revenue",
+      filingUrl: sec.filingUrl,
+      formType: sec.formType,
+      filingDate: sec.filingDate,
     });
-    if (filing.businessDescription && !items.some((i) => i.section?.includes("Business"))) {
-      items.push({
-        text: filing.businessDescription.slice(0, 400),
-        section: "Item 1 — Business",
-        filingUrl: filing.filingUrl,
-        formType: filing.formType,
-        fiscalYear: filing.fiscalYear,
-        filingDate: filing.filingDate,
-      });
-    }
   }
 
   return items;
-}
-
-function filingToExcerptStrings(filing: SECFilingSource): string[] {
-  return [
-    filing.businessDescription ?? "",
-    ...(filing.segmentRevenueText ?? []),
-    ...filing.sourceSnippets.map((s) => s.text),
-  ].filter(Boolean);
 }
 
 export const structuredAiGateway: AiGateway = {
@@ -126,58 +108,49 @@ export const structuredAiGateway: AiGateway = {
 
     return seeds.map((s) => {
       const co = companyByTicker.get(s.ticker);
-      const filing = req.filings.get(s.ticker);
+      const sec = req.secRevenues.get(s.ticker);
       const breakdown = computeConfidenceBreakdown(
         req.segments,
         co?.name ?? s.name,
         co?.description,
-        filing,
+        sec,
       );
       const confidence = breakdown.finalConfidence;
-      const totalRev =
-        filing?.revenueLineItems?.[0]?.value ?? 800 + Math.round(Math.random() * 4000);
-      const evidenceItems = buildEvidenceItems(filing, req.segments);
+      const totalRev = sec?.totalCompanyRevenue ?? null;
+      const evidenceItems = buildEvidenceItems(sec, req.segments);
+      const rationale = buildEvidenceBackedRationale(confidence, breakdown, sec, req.segments);
+
+      const hasSecFiling =
+        sec?.retrievalStatus === "live" || sec?.retrievalStatus === "fallback_10q";
+      const segmentRev =
+        totalRev != null
+          ? Math.round(totalRev * s.share)
+          : hasSecFiling
+            ? undefined
+            : Math.round(800 * s.share);
 
       return {
-        companyName: co?.name ?? filing?.companyName ?? s.name,
+        companyName: co?.name ?? sec?.companyName ?? s.name,
         ticker: s.ticker,
         exchange: co?.exchange,
         confidence,
         confidenceBreakdown: breakdown,
         matchedSegment: primary.name,
         taxonomyPath: primary.path,
-        rationale: breakdown.rationale,
+        rationale,
         supportingEvidence: evidenceItems.map((e) => e.text).filter(Boolean),
         evidenceItems,
-        secFiling: filing,
-        estimatedSegmentRevenue: Math.round(totalRev * s.share),
+        secRevenue: sec,
+        estimatedSegmentRevenue: segmentRev,
         estimatedSegmentShare: s.share,
-        needsReview: confidence < 0.8,
+        needsReview: confidence < 0.8 || sec?.retrievalStatus === "unavailable",
       } satisfies VendorMatch;
     });
   },
 };
 
-/** @deprecated use structuredAiGateway */
 export const mockAiGateway = structuredAiGateway;
 
-export async function enrichWithFilings(
-  tickers: string[],
-  sec: { getLatestFiling(t: string): Promise<SECFilingSource | null> },
-): Promise<Map<string, SECFilingSource>> {
-  const map = new Map<string, SECFilingSource>();
-  for (const t of tickers.slice(0, 8)) {
-    try {
-      const f = await sec.getLatestFiling(t);
-      if (f) map.set(t.toUpperCase(), f);
-    } catch {
-      /* skip unavailable */
-    }
-  }
-  return map;
-}
-
-/** Legacy adapter */
 export function segmentsFromTaxonomy(
   segment: TaxonomySelection,
   adjacent: TaxonomySelection[] = [],

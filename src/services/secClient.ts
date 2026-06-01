@@ -1,26 +1,15 @@
-/** SEC EDGAR client — real EDGAR by default; mock only when VITE_USE_MOCK_SEC=true */
+/** SEC EDGAR client — live EDGAR by default; mock only when VITE_USE_MOCK_SEC_DATA=true (not in production flow) */
 
-import type { RevenueLineItem, SECFilingSource, SourceSnippet } from "@/types/taxonomy";
+import type { SECRevenueSource } from "@/types/sec";
 import { edgarSecClient } from "./edgarSecClient";
 
-export type { SECFilingSource, SourceSnippet, RevenueLineItem };
-
-/** @deprecated use SECFilingSource */
-export type SecFiling = {
-  ticker: string;
-  companyName: string;
-  form: string;
-  fiscalYear: number;
-  filedAt: string;
-  excerpt: string;
-  revenueLines: { label: string; amountUsdM: number }[];
-};
+export type { SECRevenueSource };
 
 export interface SecClient {
-  getLatestFiling(ticker: string): Promise<SECFilingSource | null>;
+  getSECRevenueSource(ticker: string): Promise<SECRevenueSource>;
 }
 
-const MOCK_FILINGS: Record<string, SECFilingSource> = {
+const MOCK_SOURCES: Record<string, SECRevenueSource> = {
   CRWD: {
     companyName: "CrowdStrike Holdings, Inc.",
     ticker: "CRWD",
@@ -30,19 +19,14 @@ const MOCK_FILINGS: Record<string, SECFilingSource> = {
     filingDate: "2025-03-20",
     fiscalYear: "2025",
     filingUrl: "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=1535527&type=10-K",
-    businessDescription:
+    revenueMetric: "Revenues",
+    totalCompanyRevenue: 3060,
+    currency: "USD",
+    sourceExcerpt:
       "We derive substantially all of our revenue from subscriptions to our cloud platform, including endpoint security, identity protection, and cloud security modules.",
-    revenueLineItems: [
-      { label: "Subscription revenue", value: 3060, period: "FY2025" },
-      { label: "Endpoint security (est. segment)", value: 1840, period: "FY2025" },
-    ],
-    sourceSnippets: [
-      {
-        text: "Subscriptions to our cloud platform, including endpoint security, identity protection, and cloud security modules.",
-        section: "Item 1 — Business (mock)",
-        filingUrl: "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=1535527&type=10-K",
-      },
-    ],
+    sourceLocation: "Item 1 — Business (mock)",
+    retrievalStatus: "live",
+    retrievedAt: new Date().toISOString(),
   },
   PANW: {
     companyName: "Palo Alto Networks, Inc.",
@@ -53,24 +37,24 @@ const MOCK_FILINGS: Record<string, SECFilingSource> = {
     filingDate: "2025-09-05",
     fiscalYear: "2025",
     filingUrl: "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=1327567&type=10-K",
-    businessDescription:
+    revenueMetric: "Revenues",
+    totalCompanyRevenue: 7520,
+    currency: "USD",
+    sourceExcerpt:
       "Revenue from our Network Security and Prisma Cloud offerings represents the majority of total revenue.",
-    revenueLineItems: [{ label: "Total revenue", value: 7520, period: "FY2025" }],
-    sourceSnippets: [
-      {
-        text: "Network Security and Prisma Cloud offerings represents the majority of total revenue.",
-        section: "Item 1 — Business (mock)",
-        filingUrl: "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=1327567&type=10-K",
-      },
-    ],
+    sourceLocation: "Item 1 — Business (mock)",
+    retrievalStatus: "live",
+    retrievedAt: new Date().toISOString(),
   },
 };
 
 export const mockSecClient: SecClient = {
-  async getLatestFiling(ticker: string) {
+  async getSECRevenueSource(ticker: string) {
     await delay(200);
     const key = ticker.toUpperCase();
-    if (MOCK_FILINGS[key]) return MOCK_FILINGS[key];
+    if (MOCK_SOURCES[key]) {
+      return { ...MOCK_SOURCES[key], retrievedAt: new Date().toISOString() };
+    }
     return {
       companyName: ticker,
       ticker: key,
@@ -80,25 +64,57 @@ export const mockSecClient: SecClient = {
       filingDate: "2025-01-15",
       fiscalYear: "2025",
       filingUrl: `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&ticker=${key}&type=10-K`,
-      businessDescription: `Business description references enterprise software aligned with ${key} product portfolio (mock SEC excerpt).`,
-      revenueLineItems: [{ label: "Total revenue", value: 500 + Math.round(Math.random() * 2000), period: "FY2025" }],
-      sourceSnippets: [
-        {
-          text: `Mock filing excerpt for ${key} — enable live SEC only in development with VITE_USE_MOCK_SEC=true.`,
-          section: "Mock",
-          filingUrl: `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&ticker=${key}&type=10-K`,
-        },
-      ],
+      revenueMetric: "Revenues",
+      totalCompanyRevenue: 500 + Math.round(Math.random() * 2000),
+      currency: "USD",
+      sourceExcerpt: `Mock SEC excerpt for ${key} (not live EDGAR).`,
+      sourceLocation: "Mock",
+      retrievalStatus: "live",
+      retrievedAt: new Date().toISOString(),
     };
   },
 };
 
 export function useMockSec(): boolean {
+  const flag = import.meta.env.VITE_USE_MOCK_SEC_DATA;
+  if (flag === "true") return true;
+  if (flag === "false") return false;
   return import.meta.env.VITE_USE_MOCK_SEC === "true";
 }
 
 export function getSecClient(): SecClient {
   return useMockSec() ? mockSecClient : edgarSecClient;
+}
+
+export async function enrichWithSecRevenue(tickers: string[]): Promise<Map<string, SECRevenueSource>> {
+  const sec = getSecClient();
+  const map = new Map<string, SECRevenueSource>();
+  for (const t of tickers) {
+    try {
+      const source = await sec.getSECRevenueSource(t);
+      map.set(t.toUpperCase(), source);
+      if (!useMockSec()) await delay(150);
+    } catch (e) {
+      const sym = t.toUpperCase();
+      map.set(sym, {
+        companyName: sym,
+        ticker: sym,
+        cik: "0000000000",
+        formType: "—",
+        accessionNumber: "—",
+        filingDate: "—",
+        filingUrl: `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&ticker=${sym}`,
+        revenueMetric: "—",
+        totalCompanyRevenue: null,
+        currency: "USD",
+        sourceExcerpt: "",
+        retrievalStatus: "error",
+        retrievedAt: new Date().toISOString(),
+        errorMessage: e instanceof Error ? e.message : "Retrieval failed",
+      });
+    }
+  }
+  return map;
 }
 
 function delay(ms: number) {

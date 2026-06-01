@@ -1,4 +1,5 @@
-import type { ConfidenceBreakdown, EvidenceItem, MappingStatus, SECFilingSource } from "@/types/taxonomy";
+import type { ConfidenceBreakdown, EvidenceItem, MappingStatus } from "@/types/taxonomy";
+import type { SECRevenueSource, SecRetrievalStatus } from "@/types/sec";
 
 export type Vendor = {
   id: string;
@@ -18,7 +19,11 @@ export type Vendor = {
   confidenceBreakdown?: ConfidenceBreakdown;
   supportingEvidence?: string[];
   evidenceItems?: EvidenceItem[];
-  secFiling?: SECFilingSource;
+  secRevenue?: SECRevenueSource;
+  secDataStatus?: SecRetrievalStatus;
+  secRetrievedAt?: string;
+  revenueMetric?: string;
+  totalCompanyRevenue?: number | null;
   cik?: string;
   accessionNumber?: string;
   filingUrl?: string;
@@ -108,7 +113,7 @@ export const initialAssumptions: Assumption[] = [
     value: 0,
     unit: "%",
     source: "US default",
-    description: "Share of revenue from outside selected geography (0 for US-only).",
+    description: "Reserved for future international revenue adjustments (not applied in this iteration).",
     editable: true,
   },
   {

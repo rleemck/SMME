@@ -19,16 +19,15 @@ import {
 } from "@/lib/vendorSelection";
 import { DEFAULT_RECOMMENDED_CONFIDENCE_THRESHOLD } from "@/types/vendorSelection";
 
-export const US_GEOGRAPHY = "United States";
-export const US_GEOGRAPHY_HELPER =
-  "Geography is fixed to the United States for this MVP because vendor revenue mapping uses SEC filings.";
+import { REVENUE_HELPER_TEXT } from "@/types/sec";
+
+export { REVENUE_HELPER_TEXT };
 
 const LATEST_FISCAL_YEAR = "2025 (latest available)";
 
 type Market = {
   name: string;
   description: string;
-  geography: string;
   timeframe: string;
   marketType: "horizontal" | "vertical";
   dataSource: string;
@@ -80,12 +79,13 @@ type Ctx = {
 const ModelContext = createContext<Ctx | null>(null);
 
 function vendorFromMatch(m: VendorMatch, i: number): Vendor {
-  const rev =
+  const sec = m.secRevenue;
+  const totalRev = sec?.totalCompanyRevenue ?? null;
+  const share = m.estimatedSegmentShare ?? 0.1;
+  const segmentRev =
     m.estimatedSegmentRevenue ??
-    m.secFiling?.revenueLineItems?.[0]?.value ??
-    500;
-  const totalRev = m.secFiling?.revenueLineItems?.[0]?.value ?? rev * 2;
-  const fy = m.secFiling?.fiscalYear ? parseInt(m.secFiling.fiscalYear, 10) : 2025;
+    (totalRev != null ? Math.round(totalRev * share) : undefined);
+  const fy = sec?.fiscalYear ? parseInt(sec.fiscalYear, 10) : 2025;
   const originalAIRecommendation = !m.needsReview;
   const originalAIStatus: Vendor["originalAIStatus"] = m.needsReview ? "Pending" : "Included";
 
@@ -94,9 +94,11 @@ function vendorFromMatch(m: VendorMatch, i: number): Vendor {
     name: m.companyName,
     ticker: m.ticker,
     exchange: m.exchange,
-    filingType: m.secFiling?.formType ?? "10-K",
-    revenue: totalRev,
-    segmentRevenue: rev,
+    filingType: sec?.formType ?? "10-K",
+    revenue: totalRev ?? 0,
+    totalCompanyRevenue: totalRev,
+    segmentRevenue: segmentRev,
+    revenueMetric: sec?.revenueMetric,
     segment: m.matchedSegment,
     confidence: m.confidence,
     coverage: m.confidence * 0.95,
@@ -105,23 +107,25 @@ function vendorFromMatch(m: VendorMatch, i: number): Vendor {
     originalAIStatus,
     manuallyOverridden: false,
     growth: 12 + Math.round(Math.random() * 20),
-    share: Math.round((m.estimatedSegmentShare ?? 0.1) * 100),
-    segmentShare: m.estimatedSegmentShare,
+    share: Math.round(share * 100),
+    segmentShare: share,
     rationale: m.rationale,
-    confidenceRationale: m.confidenceBreakdown.rationale,
+    confidenceRationale: m.rationale,
     confidenceBreakdown: m.confidenceBreakdown,
     supportingEvidence: m.supportingEvidence,
     evidenceItems: m.evidenceItems,
-    secFiling: m.secFiling,
-    cik: m.secFiling?.cik,
-    accessionNumber: m.secFiling?.accessionNumber,
-    filingUrl: m.secFiling?.filingUrl,
+    secRevenue: sec,
+    secDataStatus: sec?.retrievalStatus,
+    secRetrievedAt: sec?.retrievedAt,
+    cik: sec?.cik,
+    accessionNumber: sec?.accessionNumber,
+    filingUrl: sec?.filingUrl,
     matchedSegment: m.matchedSegment,
     taxonomyPath: m.taxonomyPath,
     needsReview: m.needsReview,
     mappingStatus: m.needsReview ? "needs_review" : "mapped",
     fiscalYear: Number.isNaN(fy) ? 2025 : fy,
-    filingSource: useMockSec() ? "SEC EDGAR (mock fallback)" : "SEC EDGAR",
+    filingSource: useMockSec() ? "SEC EDGAR (mock)" : "SEC EDGAR (live)",
   };
 }
 
@@ -156,7 +160,6 @@ export function ModelProvider({ children }: { children: ReactNode }) {
   const [market, setMarketState] = useState<Market>({
     name: "Software market",
     description: "",
-    geography: US_GEOGRAPHY,
     timeframe: LATEST_FISCAL_YEAR,
     marketType: "horizontal",
     dataSource: "SEC / public company filings",
@@ -180,12 +183,7 @@ export function ModelProvider({ children }: { children: ReactNode }) {
     [selectedSegments],
   );
 
-  const setMarket = (m: Partial<Market>) =>
-    setMarketState((s) => ({
-      ...s,
-      ...m,
-      geography: US_GEOGRAPHY,
-    }));
+  const setMarket = (m: Partial<Market>) => setMarketState((s) => ({ ...s, ...m }));
 
   const setSelectedSegments = useCallback((segments: SelectedTaxonomySegment[]) => {
     const normalized =
@@ -335,7 +333,7 @@ export function ModelProvider({ children }: { children: ReactNode }) {
           name: primary.name,
           description: primary.expandedDefinition ?? primary.definition ?? primary.name,
           marketType: primary.isHorizontal === false ? "vertical" : "horizontal",
-          dataSource: "SEC / public company filings (US)",
+          dataSource: "SEC EDGAR · total company revenue",
         });
       }
     } catch (e) {
@@ -369,7 +367,7 @@ export function ModelProvider({ children }: { children: ReactNode }) {
   }, [selectedSegments, vendors, includedVendors]);
 
   const tamBreakdown = useMemo(
-    () => calculateTam(vendors, assumptions, US_GEOGRAPHY),
+    () => calculateTam(vendors, assumptions),
     [vendors, assumptions],
   );
 

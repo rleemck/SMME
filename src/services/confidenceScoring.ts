@@ -1,4 +1,5 @@
-import type { ConfidenceBreakdown, SECFilingSource, SelectedTaxonomySegment } from "@/types/taxonomy";
+import type { ConfidenceBreakdown, SelectedTaxonomySegment } from "@/types/taxonomy";
+import type { SECRevenueSource } from "@/types/sec";
 
 const WEIGHTS = {
   taxonomyTermMatch: 0.2,
@@ -33,11 +34,24 @@ function segmentWeight(seg: SelectedTaxonomySegment, primary: SelectedTaxonomySe
   return seg.isPrimary || seg.id === primary.id ? 1 : 0.45;
 }
 
+/** Combined taxonomy text for product-description overlap; primary segment is emphasized. */
+function buildCombinedDefinition(segments: SelectedTaxonomySegment[]): string {
+  return segments
+    .map((s) => {
+      const text = `${s.name} ${s.expandedDefinition ?? s.definition ?? ""}`.trim();
+      if (!text) return "";
+      // Duplicate primary text so token overlap weights it ~2× vs adjacent segments.
+      return s.isPrimary ? `${text} ${text}` : text;
+    })
+    .filter(Boolean)
+    .join(" ");
+}
+
 export function computeConfidenceBreakdown(
   segments: SelectedTaxonomySegment[],
   companyName: string,
   companyDescription: string | undefined,
-  filing: SECFilingSource | null | undefined,
+  sec: SECRevenueSource | null | undefined,
 ): ConfidenceBreakdown {
   const primary = segments.find((s) => s.isPrimary) ?? segments[0];
   if (!primary) {
@@ -53,20 +67,9 @@ export function computeConfidenceBreakdown(
     };
   }
 
-  const combinedDef = segments
-    .map((s) => {
-      const w = segmentWeight(s, primary);
-      return `${s.name} ${s.expandedDefinition ?? s.definition ?? ""}`.repeat(s.isPrimary ? 1 : 0).padEnd(
-        0,
-      ) + (s.isPrimary ? "" : ` ${(s.expandedDefinition ?? s.definition ?? "")}`);
-    })
-    .join(" ");
+  const combinedDef = buildCombinedDefinition(segments);
 
-  const filingText = [
-    filing?.businessDescription ?? "",
-    ...(filing?.segmentRevenueText ?? []),
-    ...(filing?.sourceSnippets?.map((s) => s.text) ?? []),
-  ].join(" ");
+  const filingText = sec?.sourceExcerpt ?? "";
 
   const productText = [companyDescription ?? "", companyName, filingText].join(" ");
 
@@ -87,20 +90,28 @@ export function computeConfidenceBreakdown(
   expandedDefinitionMatch = Math.min(1, expandedDefinitionMatch);
 
   const productDescriptionMatch = Math.min(1, overlapScore(combinedDef, productText));
-  const segmentRevenueEvidence = filing?.revenueLineItems?.length
-    ? Math.min(1, 0.5 + filing.revenueLineItems.length * 0.15)
-    : filing?.segmentRevenueText?.length
-      ? Math.min(1, 0.4 + filing.segmentRevenueText.length * 0.2)
-      : filingText ? 0.25 : 0;
+  const segmentRevenueEvidence =
+    sec?.totalCompanyRevenue != null && sec.totalCompanyRevenue > 0
+      ? Math.min(1, 0.55 + (sec.revenueMetric !== "—" ? 0.25 : 0))
+      : filingText
+        ? 0.25
+        : 0;
 
-  const filingEvidenceQuality = filing
-    ? Math.min(1, 0.35 + (filing.sourceSnippets.length > 0 ? 0.35 : 0) + (filing.businessDescription ? 0.3 : 0))
+  const filingEvidenceQuality = sec
+    ? Math.min(
+        1,
+        0.2 +
+          (sec.retrievalStatus === "live" ? 0.45 : sec.retrievalStatus === "fallback_10q" ? 0.3 : 0.1) +
+          (filingText ? 0.25 : 0),
+      )
     : 0;
 
   let negativeSignals = 0;
   const negPatterns = [/excluded from/i, /not material/i, /discontinued operations/i, /unrelated to/i];
   if (negPatterns.some((p) => p.test(filingText + productText))) negativeSignals = 0.12;
-  if (!filing) negativeSignals += 0.08;
+  if (!sec || sec.retrievalStatus === "unavailable" || sec.retrievalStatus === "error") {
+    negativeSignals += 0.08;
+  }
 
   const weighted =
     taxonomyTermMatch * WEIGHTS.taxonomyTermMatch +

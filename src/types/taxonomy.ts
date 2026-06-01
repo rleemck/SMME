@@ -115,6 +115,7 @@ export type VendorMatch = {
   supportingEvidence: string[];
   evidenceItems: EvidenceItem[];
   secFiling?: SECFilingSource;
+  secRevenue?: import("@/types/sec").SECRevenueSource;
   estimatedSegmentRevenue?: number;
   estimatedSegmentShare?: number;
   needsReview: boolean;

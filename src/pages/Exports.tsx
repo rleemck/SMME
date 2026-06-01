@@ -52,7 +52,7 @@ export default function Exports() {
               onClick={() =>
                 exportModelWorkbook({
                   marketName: market.name,
-                  geography: market.geography,
+                  dataSource: market.dataSource,
                   timeframe: market.timeframe,
                   primarySegment,
                   adjacentSegments,
@@ -88,8 +88,8 @@ export default function Exports() {
                     <td className="px-3 py-2 font-semibold" colSpan={2}>{market.name} — TAM Model</td>
                   </tr>
                   <tr className="border-b">
-                    <td className="px-3 py-2 text-muted-foreground">Geography</td>
-                    <td className="px-3 py-2 font-medium">{market.geography}</td>
+                    <td className="px-3 py-2 text-muted-foreground">Data source</td>
+                    <td className="px-3 py-2 font-medium">{market.dataSource}</td>
                   </tr>
                   <tr className="border-b">
                     <td className="px-3 py-2 text-muted-foreground">Timeframe</td>
