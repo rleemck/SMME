@@ -11,7 +11,7 @@ import { ArrowRight, FileText, Layers, Calculator, Loader2 } from "lucide-react"
 import { toast } from "sonner";
 import { PageShell } from "@/components/layout/PageShell";
 
-export default function Index() {
+export default function ScopingMarketDefinition() {
   const navigate = useNavigate();
   const {
     setMarket,
@@ -42,7 +42,7 @@ export default function Index() {
     });
     if (defaults) resetAssumptions();
     await generateScoping();
-    navigate("/scoping");
+    navigate("/scoping/vendors");
   };
 
   return (
@@ -51,9 +51,9 @@ export default function Index() {
         <SecMockBanner />
       </div>
       <div className="mb-8">
-        <div className="mds-eyebrow mb-2">Market Definition</div>
+        <div className="mds-eyebrow mb-2">Software Scoping Expert · Step 1</div>
         <h1 className="text-3xl font-semibold text-mds-navy">Define your software market</h1>
-        <p className="text-muted-foreground mt-2 max-w-2xl">
+        <p className="text-muted-foreground mt-2 max-w-2xl leading-relaxed">
           Select one or more taxonomy segments. The Scoping Expert matches vendors using SEC filings and
           pulls total company revenue from the latest annual filing (10-K preferred).
         </p>
@@ -107,12 +107,12 @@ export default function Index() {
             ) : (
               <ArrowRight className="h-4 w-4" />
             )}
-            Generate Market Model
+            Generate vendor universe
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
         <KpiCard icon={FileText} label="Taxonomy segments" value="63" />
         <KpiCard icon={Layers} label="Public companies" value="5,300+" />
         <KpiCard icon={Calculator} label="Data source" value="SEC EDGAR" />
@@ -131,9 +131,9 @@ function KpiCard({
   value: string;
 }) {
   return (
-    <div className="mds-kpi">
+    <div className="mds-kpi min-w-0">
       <Icon className="h-5 w-5 text-mds-blue mb-2" />
-      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="text-xs text-muted-foreground break-words">{label}</div>
       <div className="text-2xl font-semibold text-mds-navy mt-2">{value}</div>
     </div>
   );
